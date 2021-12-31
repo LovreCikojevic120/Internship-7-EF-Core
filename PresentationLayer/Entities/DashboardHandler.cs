@@ -1,5 +1,6 @@
 ﻿using DomainLayer.Queries;
 using DomainLayer.DatabaseEnums;
+using DomainLayer.Entities;
 
 namespace PresentationLayer.Entities
 {
@@ -77,6 +78,30 @@ namespace PresentationLayer.Entities
             }while(validInput is false);
 
             return ResourceTag.Dev;
+        }
+
+        public static void GetUserInfo()
+        {
+            var currentUserInfo = DatabaseStateTracker.CurrentUser;
+            Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role}");
+        }
+
+        public static void GetPopularResources()
+        {
+            var resourceQuery = new ResourceQueries();
+
+            var resourceList = resourceQuery.GetPopularResources();
+
+            if(resourceList is null)
+            {
+                //empty list
+                return;
+            }
+
+            foreach(var resource in resourceList)
+            {
+                Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
+            }
         }
     }
 }

@@ -69,13 +69,14 @@ namespace PresentationLayer.Entities
                     DashboardHandler.GetNoReplyResouces();
                     break;
                 case (int)Enums.DashboardOptions.Popular:
-                    //GetPopularResources
+                    DashboardHandler.GetPopularResources();
                     break;
                 case (int)Enums.DashboardOptions.MyProfile:
-                    //GetUserInfo
+                    DashboardHandler.GetUserInfo();
                     break;
                 case (int)Enums.DashboardOptions.Logout:
-                    //Logout
+                    Console.WriteLine("logout!");
+                    Console.ReadKey();
                     return false;
                 default:
                     Console.WriteLine("Neispravan unos!");
