@@ -2,7 +2,7 @@
 using System.Configuration;
 using DataLayer.Entities;
 
-namespace DomainLayer.Factories
+namespace DomainLayer.Entities
 {
     public static class DbContextFactory
     {

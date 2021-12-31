@@ -11,15 +11,15 @@ namespace DataLayer.Entities
     {
         public StackInternshipDbContext(DbContextOptions options) : base(options)
         {
+
         }
 
-        public DbSet<Users> Users { get; set; }
-        public DbSet<Resources> Resources { get; set; }
-        public DbSet<Comments> Comments { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Resource> Resources { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             DbSeeder.Execute(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
