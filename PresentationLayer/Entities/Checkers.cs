@@ -7,7 +7,7 @@
             if (string.IsNullOrEmpty(suspectString) || string.IsNullOrWhiteSpace(suspectString) ||
                 suspectString.Length < 5)
             {
-                //error
+                Printer.ConfirmMessage("Polje neispravno upisano");
                 result = string.Empty;
                 return false;
             }

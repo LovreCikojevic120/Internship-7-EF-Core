@@ -12,6 +12,7 @@ namespace PresentationLayer.Entities
 
             do
             {
+
                 Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
                 validName = Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
                 username = possibleName;
@@ -36,6 +37,7 @@ namespace PresentationLayer.Entities
 
             do
             {
+
                 Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
                 username = Console.ReadLine().Trim();
 
@@ -46,14 +48,12 @@ namespace PresentationLayer.Entities
 
                 if (loginSuccess is true)
                 {
-                    Console.WriteLine($"{DatabaseStateTracker.CurrentUser.UserName} " +
-                        $"{DatabaseStateTracker.CurrentUser.Password}");
+                    Printer.ConfirmMessage($"Uspjesno ste prijavljeni kao: {DatabaseStateTracker.CurrentUser.UserName}");
                     MenuManager.DashboardMenu();
                     return;
                 }
 
-                //no user
-                Console.WriteLine("Nema!");
+                Printer.ConfirmMessage($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu");
 
             } while (loginSuccess is false);
         }

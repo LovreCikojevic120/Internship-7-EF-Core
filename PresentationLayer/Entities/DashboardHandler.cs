@@ -8,7 +8,8 @@ namespace PresentationLayer.Entities
     {
         public static void GetResourcesByTag()
         {
-            //print resource tags
+            Printer.PrintResourceTagList();
+
             var resourceCategory = ResourceTagSelect();
 
             var resourceQuery = new ResourceQueries();
@@ -16,16 +17,20 @@ namespace PresentationLayer.Entities
 
             if (resourceList is null || resourceList.Count is 0)
             {
-                Console.WriteLine("Nema resursa!");
+                Printer.ConfirmMessage("Lista resursa prazna");
                 return;
             }
 
             foreach (var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
+
+
         }
 
         public static void GetNoReplyResouces()
         {
+            Printer.PrintResourceTagList();
+
             var resourceCategory = ResourceTagSelect();
             var resourceQuery = new ResourceQueries();
 
@@ -33,12 +38,14 @@ namespace PresentationLayer.Entities
 
             if (resourceList is null || resourceList.Count is 0)
             {
-                Console.WriteLine("Nema resursa!");
+                Printer.ConfirmMessage("Lista resursa prazna");
                 return;
             }
 
             foreach (var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
+
+            Printer.ConfirmMessage($"Resursi bez komentara sa tagom {Enum.GetName(resourceCategory)} ispisani");
         }
 
         public static void GetAllUsers()
@@ -48,6 +55,8 @@ namespace PresentationLayer.Entities
 
             foreach (var user in usersList)
                 Console.WriteLine($"{user.UserName} {user.Role} {user.RepPoints}");
+
+            Printer.ConfirmMessage($"Korisnici dohvaceni");
         }
 
         private static ResourceTag ResourceTagSelect()
@@ -84,6 +93,8 @@ namespace PresentationLayer.Entities
         {
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
             Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role}");
+
+            Printer.ConfirmMessage($"Vasi podaci dohvaceni");
         }
 
         public static void GetPopularResources()
@@ -94,14 +105,14 @@ namespace PresentationLayer.Entities
 
             if(resourceList is null)
             {
-                //empty list
+                Printer.ConfirmMessage("Lista resursa prazna");
                 return;
             }
 
             foreach(var resource in resourceList)
-            {
                 Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
-            }
+
+            Printer.ConfirmMessage("Top 5 najkomentiranijih resursa dohvaceno");
         }
     }
 }

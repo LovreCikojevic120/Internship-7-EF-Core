@@ -8,11 +8,13 @@ namespace PresentationLayer.Entities
     {
         public static bool MainMenuSwitcher()
         {
+            Printer.PrintMainMenu();
+
             var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
 
             if (!isValidInput)
             {
-                //handle error
+                Printer.ConfirmMessage("Unos opcije izbornika neispravan");
                 return true;
             }
 
@@ -46,14 +48,13 @@ namespace PresentationLayer.Entities
 
         private static bool DashboardSwitcher()
         {
-            Console.WriteLine("Uspjesno ste prijavljeni, izaberite jednu od opcija:");
-            //print dashboard
+            Printer.PrintDashboard();
 
             var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
 
             if (!isValidInput)
             {
-                //handle error
+                Printer.ConfirmMessage("Unos opcije izbornika neispravan");
                 return true;
             }
 
@@ -75,8 +76,7 @@ namespace PresentationLayer.Entities
                     DashboardHandler.GetUserInfo();
                     break;
                 case (int)Enums.DashboardOptions.Logout:
-                    Console.WriteLine("logout!");
-                    Console.ReadKey();
+                    Printer.ConfirmMessage("Odjavljeni ste iz sustava");
                     return false;
                 default:
                     Console.WriteLine("Neispravan unos!");
