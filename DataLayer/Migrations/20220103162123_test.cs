@@ -30,8 +30,7 @@ namespace DataLayer.Migrations
                 name: "Resources",
                 columns: table => new
                 {
-                    ResourceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResourceId = table.Column<int>(type: "int", nullable: false),
                     ResourceContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ResourceOwnerId = table.Column<int>(type: "int", nullable: false),
                     NumberOfReplys = table.Column<int>(type: "int", nullable: false),
@@ -47,23 +46,21 @@ namespace DataLayer.Migrations
                         name: "FK_Resources_Users_ResourceOwnerId",
                         column: x => x.ResourceOwnerId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
-                    CommentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CommentId = table.Column<int>(type: "int", nullable: false),
                     CommentContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NumberOfLikes = table.Column<int>(type: "int", nullable: false),
                     NumberOfDislikes = table.Column<int>(type: "int", nullable: false),
                     CommentOwnerId = table.Column<int>(type: "int", nullable: false),
                     ParentCommentId = table.Column<int>(type: "int", nullable: true),
                     TimeOfPosting = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResourceId = table.Column<int>(type: "int", nullable: false)
+                    ResourceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,14 +69,60 @@ namespace DataLayer.Migrations
                         name: "FK_Comments_Resources_ResourceId",
                         column: x => x.ResourceId,
                         principalTable: "Resources",
-                        principalColumn: "ResourceId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ResourceId");
                     table.ForeignKey(
                         name: "FK_Comments_Users_CommentOwnerId",
                         column: x => x.CommentOwnerId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserResources",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ResourceId = table.Column<int>(type: "int", nullable: false),
+                    IsVoted = table.Column<bool>(type: "bit", nullable: false),
+                    IsCommented = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserResources", x => new { x.UserId, x.ResourceId });
+                    table.ForeignKey(
+                        name: "FK_UserResources_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "ResourceId");
+                    table.ForeignKey(
+                        name: "FK_UserResources_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserComments",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CommentId = table.Column<int>(type: "int", nullable: false),
+                    IsVoted = table.Column<bool>(type: "bit", nullable: false),
+                    IsCommented = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserComments", x => new { x.UserId, x.CommentId });
+                    table.ForeignKey(
+                        name: "FK_UserComments_Comments_CommentId",
+                        column: x => x.CommentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId");
+                    table.ForeignKey(
+                        name: "FK_UserComments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.InsertData(
@@ -90,12 +133,27 @@ namespace DataLayer.Migrations
             migrationBuilder.InsertData(
                 table: "Resources",
                 columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
-                values: new object[] { 1, "Dev", 7, 7, 7, "Fritule su najbolje slatko", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 1, "Dev", 4, 4, 7, "Fritule su najbolje slatko", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+
+            migrationBuilder.InsertData(
+                table: "Resources",
+                columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
+                values: new object[] { 2, "Generalno", 4, 4, 0, "Krokanti su najbolje slatko", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Comments",
                 columns: new[] { "CommentId", "CommentContent", "CommentOwnerId", "NumberOfDislikes", "NumberOfLikes", "ParentCommentId", "ResourceId", "TimeOfPosting" },
-                values: new object[] { 1, "Fritule su bezveze", 1, 4, 4, null, 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 3, "Fritule su bezveze", 1, 4, 4, null, 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+
+            migrationBuilder.InsertData(
+                table: "UserResources",
+                columns: new[] { "ResourceId", "UserId", "IsCommented", "IsVoted" },
+                values: new object[] { 1, 1, false, false });
+
+            migrationBuilder.InsertData(
+                table: "UserComments",
+                columns: new[] { "CommentId", "UserId", "IsCommented", "IsVoted" },
+                values: new object[] { 3, 1, false, false });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_CommentOwnerId",
@@ -111,10 +169,26 @@ namespace DataLayer.Migrations
                 name: "IX_Resources_ResourceOwnerId",
                 table: "Resources",
                 column: "ResourceOwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserComments_CommentId",
+                table: "UserComments",
+                column: "CommentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserResources_ResourceId",
+                table: "UserResources",
+                column: "ResourceId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "UserComments");
+
+            migrationBuilder.DropTable(
+                name: "UserResources");
+
             migrationBuilder.DropTable(
                 name: "Comments");
 

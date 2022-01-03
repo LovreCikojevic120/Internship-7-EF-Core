@@ -9,6 +9,7 @@ namespace PresentationLayer.Entities
         {
             string username, password;
             bool validName, validPassword;
+            var userQuery = new UserQueries();
 
             do
             {
@@ -21,12 +22,18 @@ namespace PresentationLayer.Entities
                 validPassword = Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
                 password = possiblePass;
 
+                if (userQuery.UserExists(username))
+                {
+                    Console.WriteLine("Ime vec postoji!");
+                    validName = false;
+                }
+
             } while (validName is false || validPassword is false);
 
-            UserQueries queries = new UserQueries();
-            queries.Register(username, password);
+            userQuery.Register(username, password);
+            Printer.ConfirmMessage("Uspjesno ste registrirani");
 
-            MenuManager.DashboardMenu();
+            MenuManager.DashboardSwitcher();
         }
 
         public static void Login()
@@ -49,7 +56,7 @@ namespace PresentationLayer.Entities
                 if (loginSuccess is true)
                 {
                     Printer.ConfirmMessage($"Uspjesno ste prijavljeni kao: {DatabaseStateTracker.CurrentUser.UserName}");
-                    MenuManager.DashboardMenu();
+                    MenuManager.DashboardSwitcher();
                     return;
                 }
 

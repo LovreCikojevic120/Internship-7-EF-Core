@@ -6,14 +6,16 @@ namespace PresentationLayer.Entities
 {
     public static class DashboardHandler
     {
-        public static void GetResourcesByTag()
+        public static void PrintEntitiesByTag()
         {
-            Printer.PrintResourceTagList();
+            Printer.PrintEntityTagList();
 
             var resourceCategory = ResourceTagSelect();
 
             var resourceQuery = new ResourceQueries();
-            var resourceList = resourceQuery.GetUserRecources(resourceCategory);
+            var commentQurey = new CommentQueries();
+
+            var resourceList = resourceQuery.GetUserResources(resourceCategory);
 
             if (resourceList is null || resourceList.Count is 0)
             {
@@ -22,14 +24,49 @@ namespace PresentationLayer.Entities
             }
 
             foreach (var resource in resourceList)
-                Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
+            {
+                Console.WriteLine($"{resource.ResourceContent} {resource.NameTag} {resource.ResourceId} {resource.NumberOfDislikes}");
 
+                resourceQuery.AddUserResource(resource.ResourceId);
+                var resourceCommentList = commentQurey.GetResourceComments(resource.ResourceId);
+                if (resourceCommentList.Count is not 0)
+                {
 
+                    foreach (var comment in resourceCommentList)
+                    {
+                        Console.WriteLine($"\t{comment.CommentId} {comment.CommentContent}");
+
+                        PrintSubcomments(comment.CommentId);
+
+                        commentQurey.AddUserComment(comment.CommentId);
+                    }
+                }
+            }
+
+            ResourceInteract.Start();
         }
 
-        public static void GetNoReplyResouces()
+        private static void PrintSubcomments(int commentId)
         {
-            Printer.PrintResourceTagList();
+            var commentQurey = new CommentQueries();
+            var subCommentList = commentQurey.GetSubComments(commentId);
+
+            if (subCommentList.Count is 0) return;
+
+            foreach (var subComment in subCommentList)
+            {
+                Console.WriteLine($"\t\t{subComment.CommentId} {subComment.CommentContent}");
+                PrintSubcomments(subComment.CommentId);
+
+                commentQurey.AddUserComment(subComment.CommentId);
+            }
+            return;
+            
+        }
+
+        public static void GetNoReplyEntities()
+        {
+            Printer.PrintEntityTagList();
 
             var resourceCategory = ResourceTagSelect();
             var resourceQuery = new ResourceQueries();
@@ -45,7 +82,7 @@ namespace PresentationLayer.Entities
             foreach (var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
 
-            Printer.ConfirmMessage($"Resursi bez komentara sa tagom {Enum.GetName(resourceCategory)} ispisani");
+            ResourceInteract.Start();
         }
 
         public static void GetAllUsers()
@@ -80,13 +117,10 @@ namespace PresentationLayer.Entities
                     case (int)ResourceTag.Generalno:
                         return ResourceTag.Generalno;
                     default:
-                        //handleWrongOption
-                        break;
+                        return ResourceTag.None;
                 }
 
             }while(validInput is false);
-
-            return ResourceTag.Dev;
         }
 
         public static void GetUserInfo()
@@ -97,7 +131,7 @@ namespace PresentationLayer.Entities
             Printer.ConfirmMessage($"Vasi podaci dohvaceni");
         }
 
-        public static void GetPopularResources()
+        public static void GetPopularEntities()
         {
             var resourceQuery = new ResourceQueries();
 
@@ -112,7 +146,7 @@ namespace PresentationLayer.Entities
             foreach(var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
 
-            Printer.ConfirmMessage("Top 5 najkomentiranijih resursa dohvaceno");
+            ResourceInteract.Start();
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DomainLayer.DatabaseEnums
+﻿namespace DomainLayer.DatabaseEnums
 {
     public enum ResourceTag
     {
@@ -12,6 +6,7 @@ namespace DomainLayer.DatabaseEnums
         Dizajn = 2,
         Marketing = 3,
         Multimedija = 4,
-        Generalno = 5
+        Generalno = 5,
+        None = 6
     }
 }

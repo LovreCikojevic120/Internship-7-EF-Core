@@ -26,7 +26,7 @@ namespace DataLayer.Entities
                 {
                     new Comment
                     {
-                        CommentId = 1,
+                        CommentId = 3,
                         CommentContent = "Fritule su bezveze",
                         NumberOfLikes = 4,
                         NumberOfDislikes = 4,
@@ -45,12 +45,44 @@ namespace DataLayer.Entities
                         ResourceId = 1,
                         ResourceContent = "Fritule su najbolje slatko",
                         NumberOfReplys = 7,
-                        NumberOfLikes = 7,
-                        NumberOfDislikes = 7,
+                        NumberOfLikes = 4,
+                        NumberOfDislikes = 4,
                         NameTag = "Dev",
                         ResourceOwnerId = 1,
+                    },
+                    new Resource
+                    {
+                        ResourceId = 2,
+                        NumberOfLikes = 4,
+                        NumberOfDislikes = 4,
+                        ResourceContent = "Krokanti su najbolje slatko",
+                        NumberOfReplys = 0,
+                        NameTag = "Generalno",
+                        ResourceOwnerId = 1,
+                    }
+                });
+
+            builder.Entity<UserResource>()
+                .HasData(new List<UserResource>
+                {
+                    new UserResource
+                    {
+                        UserId = 1,
+                        ResourceId = 1,
+                    }
+                });
+
+            builder.Entity<UserComment>()
+                .HasData(new List<UserComment>
+                {
+                    new UserComment
+                    {
+                        UserId= 1,
+                        CommentId = 3,
+                        IsVoted = false
                     }
                 });
         }
     }
 }
+

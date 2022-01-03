@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(StackInternshipDbContext))]
-    [Migration("20211230105335_test")]
+    [Migration("20220103162123_test")]
     partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,10 +27,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Entities.Models.Comment", b =>
                 {
                     b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"), 1L, 1);
 
                     b.Property<string>("CommentContent")
                         .IsRequired()
@@ -48,7 +45,7 @@ namespace DataLayer.Migrations
                     b.Property<int?>("ParentCommentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ResourceId")
+                    b.Property<int?>("ResourceId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TimeOfPosting")
@@ -65,7 +62,7 @@ namespace DataLayer.Migrations
                     b.HasData(
                         new
                         {
-                            CommentId = 1,
+                            CommentId = 3,
                             CommentContent = "Fritule su bezveze",
                             CommentOwnerId = 1,
                             NumberOfDislikes = 4,
@@ -78,10 +75,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Entities.Models.Resource", b =>
                 {
                     b.Property<int>("ResourceId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ResourceId"), 1L, 1);
 
                     b.Property<string>("NameTag")
                         .IsRequired()
@@ -117,10 +111,21 @@ namespace DataLayer.Migrations
                         {
                             ResourceId = 1,
                             NameTag = "Dev",
-                            NumberOfDislikes = 7,
-                            NumberOfLikes = 7,
+                            NumberOfDislikes = 4,
+                            NumberOfLikes = 4,
                             NumberOfReplys = 7,
                             ResourceContent = "Fritule su najbolje slatko",
+                            ResourceOwnerId = 1,
+                            TimeOfPosting = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ResourceId = 2,
+                            NameTag = "Generalno",
+                            NumberOfDislikes = 4,
+                            NumberOfLikes = 4,
+                            NumberOfReplys = 0,
+                            ResourceContent = "Krokanti su najbolje slatko",
                             ResourceOwnerId = 1,
                             TimeOfPosting = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -168,19 +173,78 @@ namespace DataLayer.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.Models.UserComment", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCommented")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVoted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "CommentId");
+
+                    b.HasIndex("CommentId");
+
+                    b.ToTable("UserComments");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            CommentId = 3,
+                            IsCommented = false,
+                            IsVoted = false
+                        });
+                });
+
+            modelBuilder.Entity("DataLayer.Entities.Models.UserResource", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCommented")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVoted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "ResourceId");
+
+                    b.HasIndex("ResourceId");
+
+                    b.ToTable("UserResources");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            ResourceId = 1,
+                            IsCommented = false,
+                            IsVoted = false
+                        });
+                });
+
             modelBuilder.Entity("DataLayer.Entities.Models.Comment", b =>
                 {
                     b.HasOne("DataLayer.Entities.Models.User", "CommentOwner")
                         .WithMany("Comments")
                         .HasForeignKey("CommentOwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("DataLayer.Entities.Models.Resource", "Resource")
                         .WithMany("Comments")
                         .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CommentOwner");
 
@@ -192,10 +256,48 @@ namespace DataLayer.Migrations
                     b.HasOne("DataLayer.Entities.Models.User", "ResourceOwner")
                         .WithMany("Resources")
                         .HasForeignKey("ResourceOwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ResourceOwner");
+                });
+
+            modelBuilder.Entity("DataLayer.Entities.Models.UserComment", b =>
+                {
+                    b.HasOne("DataLayer.Entities.Models.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DataLayer.Entities.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DataLayer.Entities.Models.UserResource", b =>
+                {
+                    b.HasOne("DataLayer.Entities.Models.Resource", "Resource")
+                        .WithMany()
+                        .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DataLayer.Entities.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Resource");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Models.Resource", b =>

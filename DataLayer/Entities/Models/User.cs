@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace DataLayer.Entities.Models
+﻿namespace DataLayer.Entities.Models
 {
     public class User
     {

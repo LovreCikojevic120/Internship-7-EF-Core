@@ -30,6 +30,11 @@ namespace DomainLayer.Queries
             return true;
         }
 
+        public bool UserExists(string username)
+        {
+            return dataBase.Users.Any(u => u.UserName == username);
+        }
+
         public ICollection<User> ReadAllUsers()
         {
             return dataBase.Users.ToList();

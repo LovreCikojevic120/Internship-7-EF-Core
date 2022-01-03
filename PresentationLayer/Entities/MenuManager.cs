@@ -27,7 +27,7 @@ namespace PresentationLayer.Entities
                     MainMenuHandler.Login();
                     break;
                 case (int)Enums.MainMenuOption.Exit:
-                    //Exit
+                    Printer.ConfirmMessage("Izasli ste iz aplikacije");
                     return false;
                 default:
                     Console.WriteLine("Neispravan unos!");
@@ -36,17 +36,7 @@ namespace PresentationLayer.Entities
             return true;
         }
 
-        public static void DashboardMenu()
-        {
-            var isLogout = false;
-            do
-            {
-                isLogout = DashboardSwitcher();
-
-            } while (isLogout);
-        }
-
-        private static bool DashboardSwitcher()
+        public static void DashboardSwitcher()
         {
             Printer.PrintDashboard();
 
@@ -55,34 +45,36 @@ namespace PresentationLayer.Entities
             if (!isValidInput)
             {
                 Printer.ConfirmMessage("Unos opcije izbornika neispravan");
-                return true;
+                return;
             }
 
-            switch (result)
+            do
             {
-                case (int)Enums.DashboardOptions.Resources:
-                    DashboardHandler.GetResourcesByTag();
-                    break;
-                case (int)Enums.DashboardOptions.Users:
-                    DashboardHandler.GetAllUsers();
-                    break;
-                case (int)Enums.DashboardOptions.NoReplys:
-                    DashboardHandler.GetNoReplyResouces();
-                    break;
-                case (int)Enums.DashboardOptions.Popular:
-                    DashboardHandler.GetPopularResources();
-                    break;
-                case (int)Enums.DashboardOptions.MyProfile:
-                    DashboardHandler.GetUserInfo();
-                    break;
-                case (int)Enums.DashboardOptions.Logout:
-                    Printer.ConfirmMessage("Odjavljeni ste iz sustava");
-                    return false;
-                default:
-                    Console.WriteLine("Neispravan unos!");
-                    break;
-            }
-            return true;
+                switch (result)
+                {
+                    case (int)Enums.DashboardOptions.Resources:
+                        DashboardHandler.PrintEntitiesByTag();
+                        break;
+                    case (int)Enums.DashboardOptions.Users:
+                        DashboardHandler.GetAllUsers();
+                        break;
+                    case (int)Enums.DashboardOptions.NoReplys:
+                        DashboardHandler.GetNoReplyEntities();
+                        break;
+                    case (int)Enums.DashboardOptions.Popular:
+                        DashboardHandler.GetPopularEntities();
+                        break;
+                    case (int)Enums.DashboardOptions.MyProfile:
+                        DashboardHandler.GetUserInfo();
+                        break;
+                    case (int)Enums.DashboardOptions.Logout:
+                        Printer.ConfirmMessage("Odjavljeni ste iz sustava");
+                        return;
+                    default:
+                        Printer.ConfirmMessage("Unijeli ste ne postojecu opciju");
+                        break;
+                }
+            }while (true);
         }
     }
 }

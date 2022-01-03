@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PresentationLayer.Entities
+﻿namespace PresentationLayer.Entities
 {
     public static class Printer
     {
@@ -15,10 +9,10 @@ namespace PresentationLayer.Entities
                 "1 - Registracija\n2 - Login\n3 - Izlaz iz aplikacije\n");
         }
 
-        internal static void PrintResourceInteractMenu()
+        internal static void PrintResourceInteractMenu(string userRole)
         {
-            Console.WriteLine("Izaberite jednu od akcija:\n1 - Komentiraj resurs\n2 - Odgovori na komentar\n" +
-                "3 - Lajkaj komentar\n4 - Dislajkaj komentar\n5 - Povratak na dashboard\n");
+            Console.WriteLine("Izaberite jednu od akcija:\n1 - Komentiraj post\n2 - Odgovori na komentar\n" +
+                "3 - Lajkaj\n4 - Dislajkaj\n5 - Nazad na dashboard\n");
         }
 
         public static void PrintDashboard()
@@ -27,7 +21,7 @@ namespace PresentationLayer.Entities
                 "1 - Objavljeni resursi\n2 - Korisnici\n3 - Neodgovoreno\n4 - Popularno\n5 - Moj profil\n6 - Logout\n");
         }
 
-        public static void PrintResourceTagList()
+        public static void PrintEntityTagList()
         {
             Console.WriteLine("1 - Dev\n2 - Dizajn\n3 - Marketing\n4 - Multimedija\n5 - Generalno\n");
         }
@@ -38,5 +32,7 @@ namespace PresentationLayer.Entities
             Console.ReadKey();
             Console.Clear();
         }
+
+
     }
 }
