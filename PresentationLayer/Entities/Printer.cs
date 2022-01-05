@@ -1,10 +1,17 @@
-﻿namespace PresentationLayer.Entities
+﻿using DomainLayer.DatabaseEnums;
+
+namespace PresentationLayer.Entities
 {
     public static class Printer
     {
+        public static void PrintResourceTagPosts(ResourceTag resourceTag)
+        {
+            Console.Clear();
+            Console.WriteLine($"==========\n{Enum.GetName(resourceTag).ToUpper()} POSTS\n==========\n");
+        }
         public static void PrintMainMenu()
         {
-
+            Console.Clear();
             Console.WriteLine("Dobrodosli, izaberite zelite li se registrirati ili prijaviti!\n" +
                 "1 - Registracija\n2 - Login\n3 - Izlaz iz aplikacije\n");
         }
@@ -17,13 +24,14 @@
 
         public static void PrintDashboard()
         {
+            Console.Clear();
             Console.WriteLine("Izaberite jednu od akcija:\n" +
                 "1 - Objavljeni resursi\n2 - Korisnici\n3 - Neodgovoreno\n4 - Popularno\n5 - Moj profil\n6 - Logout\n");
         }
 
         public static void PrintEntityTagList()
         {
-            Console.WriteLine("1 - Dev\n2 - Dizajn\n3 - Marketing\n4 - Multimedija\n5 - Generalno\n");
+            Console.WriteLine("1 - Dev\n2 - Dizajn\n3 - Marketing\n4 - Multimedija\n5 - Generalno\n6 - Nazad na dashboard\n");
         }
 
         public static void ConfirmMessage(string message)

@@ -7,7 +7,7 @@ namespace PresentationLayer.Entities
 {
     public static class ResourceInteract
     {
-        public static void Start()
+        public static void StartInteraction()
         {
             Printer.PrintResourceInteractMenu(DatabaseStateTracker.CurrentUser.Role);
 
@@ -17,6 +17,9 @@ namespace PresentationLayer.Entities
             {
                 switch (result)
                 {
+                    case (int)ResourceInteraction.New:
+                        CreateResource();
+                        break;
                     case (int)ResourceInteraction.Comment:
                         Comment();
                         break;
@@ -29,6 +32,12 @@ namespace PresentationLayer.Entities
                     case (int)ResourceInteraction.Dislike:
                         DislikeEntity();
                         break;
+                    case (int)ResourceInteraction.Edit:
+                        EditEntity();
+                        break;
+                    case (int)ResourceInteraction.Delete:
+                        DeleteEntity();
+                        break;
                     case (int)ResourceInteraction.None:
                         Printer.ConfirmMessage("Vracate se na dashboard");
                         break;
@@ -37,6 +46,44 @@ namespace PresentationLayer.Entities
                         break;
                 }
             } while (!validInput);
+        }
+
+        private static void DeleteEntity()
+        {
+            var commentQuery = new CommentQueries();
+            var resourceQuery = new ResourceQueries();
+            var helpQuery = new HelperQueries();
+
+            Console.WriteLine("Koi id?");
+            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+
+            if (hmm && helpQuery.IsResource(hm))
+                resourceQuery.DeleteResource(hm);
+
+            if (hmm && helpQuery.IsComment(hm))
+                commentQuery.DeleteComment(hm);
+
+            else Console.WriteLine("yikes");
+        }
+
+        private static void EditEntity()
+        {
+            var commentQuery = new CommentQueries();
+            var resourceQuery = new ResourceQueries();
+            var helpQuery = new HelperQueries();
+
+            Console.WriteLine("Koi id?");
+            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            Console.WriteLine("NOvi sardzaj");
+            var validString = Checkers.CheckString(Console.ReadLine(), out string newContent);
+
+            if (hmm && helpQuery.IsResource(hm))
+                resourceQuery.EditResource(hm, newContent);
+
+            if (hmm && helpQuery.IsComment(hm))
+                commentQuery.EditComment(hm, newContent);
+
+            else Console.WriteLine("yikes");
         }
 
         private static void DislikeEntity()
@@ -72,7 +119,7 @@ namespace PresentationLayer.Entities
             if (hmm && helpQuery.IsComment(hm))
                 commentQuery.LikeComment(hm);
 
-            else Console.WriteLine("yikes");
+            else Console.WriteLine("Resurs ne postoji!");
         }
 
         private static void Comment()
@@ -101,22 +148,15 @@ namespace PresentationLayer.Entities
             if (hmm && helpQuery.IsComment(hm))
                 queri.ReplyOnComment(hm);
 
-            else Console.WriteLine("yikes");
+            else Console.WriteLine("Komentar ne postoji!");
         }
 
         private static void CreateResource()
         {
-
-        }
-
-        private static void DeleteResource()
-        {
-
-        }
-
-        private static void DeleteComment()
-        {
-
+            var resourceQuery = new ResourceQueries();
+            Console.WriteLine("Sadrzaj:");
+            var content = Console.ReadLine();
+            resourceQuery.CreateResource(content);
         }
     }
 }

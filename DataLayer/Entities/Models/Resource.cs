@@ -16,5 +16,18 @@ namespace DataLayer.Entities.Models
         public string NameTag { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
+
+        public Resource(int resourceId, string content, string nameTag, int ownerId)
+        {
+            ResourceId = resourceId;
+            ResourceContent = content;
+            NumberOfLikes = 0;
+            NumberOfDislikes = 0;
+            NumberOfReplys = 0;
+            NameTag = nameTag;
+            TimeOfPosting = DateTime.Now;
+            ResourceOwnerId = ownerId;
+        }
+        public Resource() { }
     }
 }

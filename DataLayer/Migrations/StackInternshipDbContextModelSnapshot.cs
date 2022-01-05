@@ -165,7 +165,7 @@ namespace DataLayer.Migrations
                             UserId = 1,
                             IsTrusted = true,
                             Password = "12345",
-                            RepPoints = 1,
+                            RepPoints = 1000000,
                             Role = "Admin",
                             UserName = "Ivan Bakotin"
                         });

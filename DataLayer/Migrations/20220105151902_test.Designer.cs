@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(StackInternshipDbContext))]
-    [Migration("20220103162123_test")]
+    [Migration("20220105151902_test")]
     partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -167,7 +167,7 @@ namespace DataLayer.Migrations
                             UserId = 1,
                             IsTrusted = true,
                             Password = "12345",
-                            RepPoints = 1,
+                            RepPoints = 1000000,
                             Role = "Admin",
                             UserName = "Ivan Bakotin"
                         });

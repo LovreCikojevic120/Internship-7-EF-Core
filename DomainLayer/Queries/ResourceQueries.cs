@@ -53,6 +53,16 @@ namespace DomainLayer.Queries
             return resourceList;
         }
 
+        public void CreateResource(string content)
+        {
+            var newResource = new Resource(DatabaseStateTracker.GenerateEntityId(), content, Enum.GetName(DatabaseStateTracker.currentResourceTag), DatabaseStateTracker.CurrentUser.UserId);
+
+            dataBase.Resources.Add(newResource);
+            dataBase.SaveChanges();
+
+            AddUserResource(newResource.ResourceId);
+        }
+
         public void DislikeResource(int resourceId)
         {
             var helpQuery = new HelperQueries();
@@ -71,11 +81,10 @@ namespace DomainLayer.Queries
 
             var resource = dataBase.Resources.Single(r => r.ResourceId == resourceId);
             resource.NumberOfDislikes++;
+            dataBase.SaveChanges();
 
             reputationQuery.GiveDownvoteResource(resource.ResourceOwnerId);
             reputationQuery.GetDownvotePoints();
-
-            dataBase.SaveChanges();
         }
 
         public void LikeResource(int resourceId)
@@ -125,6 +134,24 @@ namespace DomainLayer.Queries
             return true;
         }
 
+        public void DeleteResource(int resourceId)
+        {
+            var resource = dataBase.Resources.Find(resourceId);
+            var resourceUser = dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId);
+            var commentQuery = new CommentQueries();
+
+            if (resourceUser is null) return;
+
+            var comments = dataBase.Comments.Where(c => c.ResourceId == resourceId).ToList();
+
+            foreach (var comment in comments)
+                commentQuery.DeleteComment(comment.CommentId);
+
+            dataBase.UserResources.Remove(resourceUser);
+            dataBase.Resources.Remove(resource);
+            dataBase.SaveChanges();
+        }
+
         public void AddUserResource(int resourceId)
         {
             if (dataBase.UserResources.Any(ur => ur.UserId == DatabaseStateTracker.CurrentUser.UserId && ur.ResourceId == resourceId))
@@ -132,6 +159,15 @@ namespace DomainLayer.Queries
 
             UserResource userResource = new UserResource(DatabaseStateTracker.CurrentUser.UserId, resourceId);
             dataBase.Add(userResource);
+            dataBase.SaveChanges();
+        }
+
+        public void EditResource(int resourceId, string newContent)
+        {
+            var resource = dataBase.Resources.Find(resourceId);
+            if (resource is null || dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId) is null) return;
+
+            resource.ResourceContent = newContent;
             dataBase.SaveChanges();
         }
 

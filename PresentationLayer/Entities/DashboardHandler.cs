@@ -12,8 +12,11 @@ namespace PresentationLayer.Entities
 
             var resourceCategory = ResourceTagSelect();
 
+            if (resourceCategory == ResourceTag.None) return;
+            Printer.PrintResourceTagPosts(resourceCategory);
+
             var resourceQuery = new ResourceQueries();
-            var commentQurey = new CommentQueries();
+            
 
             var resourceList = resourceQuery.GetUserResources(resourceCategory);
 
@@ -25,43 +28,36 @@ namespace PresentationLayer.Entities
 
             foreach (var resource in resourceList)
             {
-                Console.WriteLine($"{resource.ResourceContent} {resource.NameTag} {resource.ResourceId} {resource.NumberOfDislikes}");
+                Console.WriteLine($"ID:{resource.ResourceId} Tag: {resource.NameTag}\nSadrzaj:{resource.ResourceContent}\n" +
+                    $" Likes: {resource.NumberOfLikes} Dislikes: {resource.NumberOfDislikes}\n");
 
                 resourceQuery.AddUserResource(resource.ResourceId);
-                var resourceCommentList = commentQurey.GetResourceComments(resource.ResourceId);
-                if (resourceCommentList.Count is not 0)
-                {
 
-                    foreach (var comment in resourceCommentList)
-                    {
-                        Console.WriteLine($"\t{comment.CommentId} {comment.CommentContent}");
-
-                        PrintSubcomments(comment.CommentId);
-
-                        commentQurey.AddUserComment(comment.CommentId);
-                    }
-                }
+                Console.WriteLine("Comments:\n");
+                PrintComments(resource.ResourceId, null, "\t");
             }
 
-            ResourceInteract.Start();
+            ResourceInteract.StartInteraction();
         }
 
-        private static void PrintSubcomments(int commentId)
+        private static void PrintComments(int resourceId, int? parentCommentId, string indent)
         {
             var commentQurey = new CommentQueries();
-            var subCommentList = commentQurey.GetSubComments(commentId);
+            var resourceCommentList = commentQurey.GetResourceComments(resourceId, parentCommentId);
 
-            if (subCommentList.Count is 0) return;
-
-            foreach (var subComment in subCommentList)
+            if (resourceCommentList.Count is not 0)
             {
-                Console.WriteLine($"\t\t{subComment.CommentId} {subComment.CommentContent}");
-                PrintSubcomments(subComment.CommentId);
+                foreach (var comment in resourceCommentList)
+                {
+                    Console.WriteLine(indent + $"ID: {comment.CommentId}\n{indent}Sadrzaj: {comment.CommentContent}\n" +
+                        indent + $"Likes: {comment.NumberOfLikes} Dislikes: {comment.NumberOfDislikes}\n");
 
-                commentQurey.AddUserComment(subComment.CommentId);
+                    indent += "\t";
+                    PrintComments(resourceId, comment.CommentId, indent);
+
+                    commentQurey.AddUserComment(comment.CommentId);
+                }
             }
-            return;
-            
         }
 
         public static void GetNoReplyEntities()
@@ -69,6 +65,9 @@ namespace PresentationLayer.Entities
             Printer.PrintEntityTagList();
 
             var resourceCategory = ResourceTagSelect();
+            if (resourceCategory == ResourceTag.None) return;
+            Printer.PrintResourceTagPosts(resourceCategory);
+
             var resourceQuery = new ResourceQueries();
 
             var resourceList = resourceQuery.GetNoReplyResources(resourceCategory);
@@ -82,7 +81,7 @@ namespace PresentationLayer.Entities
             foreach (var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
 
-            ResourceInteract.Start();
+            ResourceInteract.StartInteraction();
         }
 
         public static void GetAllUsers()
@@ -98,12 +97,10 @@ namespace PresentationLayer.Entities
 
         private static ResourceTag ResourceTagSelect()
         {
-            var validInput = false;
+            var resourceTag = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
 
             do
             {
-                validInput = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
-
                 switch (menuOption)
                 {
                     case (int)ResourceTag.Dev:
@@ -116,17 +113,20 @@ namespace PresentationLayer.Entities
                         return ResourceTag.Marketing;
                     case (int)ResourceTag.Generalno:
                         return ResourceTag.Generalno;
+                    case (int)ResourceTag.None:
+                        return ResourceTag.None;
                     default:
                         return ResourceTag.None;
                 }
 
-            }while(validInput is false);
+            }
+            while(resourceTag is false);
         }
 
         public static void GetUserInfo()
         {
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
-            Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role}");
+            Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role} {currentUserInfo.RepPoints}");
 
             Printer.ConfirmMessage($"Vasi podaci dohvaceni");
         }
@@ -137,6 +137,8 @@ namespace PresentationLayer.Entities
 
             var resourceList = resourceQuery.GetPopularResources();
 
+            Printer.ConfirmMessage("popular");
+
             if(resourceList is null)
             {
                 Printer.ConfirmMessage("Lista resursa prazna");
@@ -146,7 +148,7 @@ namespace PresentationLayer.Entities
             foreach(var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
 
-            ResourceInteract.Start();
+            ResourceInteract.StartInteraction();
         }
     }
 }

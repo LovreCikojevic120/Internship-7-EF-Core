@@ -48,10 +48,10 @@ namespace DomainLayer.Queries
         {
             if (IsResource(entityId))
             {
-                return dataBase.UserResources.Any(ur => ur.UserId == DatabaseStateTracker.CurrentUser.UserId && ur.ResourceId == entityId);// && ur.IsVoted == true);
+                return dataBase.UserResources.Any(ur => ur.UserId == DatabaseStateTracker.CurrentUser.UserId && ur.ResourceId == entityId && ur.IsVoted == true);
             }
 
-            return dataBase.UserComments.Any(uc => uc.UserId == DatabaseStateTracker.CurrentUser.UserId && uc.CommentId == entityId);// && uc.IsVoted == true);
+            return dataBase.UserComments.Any(uc => uc.UserId == DatabaseStateTracker.CurrentUser.UserId && uc.CommentId == entityId && uc.IsVoted == true);
         }
 
         public bool IsCommented(int entityId)

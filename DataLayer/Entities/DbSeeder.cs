@@ -16,7 +16,7 @@ namespace DataLayer.Entities
                         UserName = "Ivan Bakotin",
                         Password = "12345",
                         Role = "Admin",
-                        RepPoints = 1,
+                        RepPoints = 1000000,
                         IsTrusted = true,
                     }
                 });

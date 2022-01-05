@@ -9,6 +9,10 @@
         public int RepPoints { get; set; }
         public bool IsTrusted { get; set; }
 
+        public bool IsDeactivated { get; set; }
+
+        public DateTime DeactivatedUntil { get; set; }
+
         public ICollection<Comment> Comments { get; set; }  
         public ICollection<Resource> Resources { get; set; }
 

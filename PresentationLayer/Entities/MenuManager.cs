@@ -38,18 +38,18 @@ namespace PresentationLayer.Entities
 
         public static void DashboardSwitcher()
         {
-            Printer.PrintDashboard();
-
-            var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
-
-            if (!isValidInput)
-            {
-                Printer.ConfirmMessage("Unos opcije izbornika neispravan");
-                return;
-            }
-
             do
             {
+                Printer.PrintDashboard();
+
+                var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
+
+                if (!isValidInput)
+                {
+                    Printer.ConfirmMessage("Unos opcije izbornika neispravan");
+                    return;
+                }
+
                 switch (result)
                 {
                     case (int)Enums.DashboardOptions.Resources:
@@ -74,7 +74,7 @@ namespace PresentationLayer.Entities
                         Printer.ConfirmMessage("Unijeli ste ne postojecu opciju");
                         break;
                 }
-            }while (true);
+            } while (true);
         }
     }
 }

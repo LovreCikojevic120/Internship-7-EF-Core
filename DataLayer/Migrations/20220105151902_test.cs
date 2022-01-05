@@ -128,7 +128,7 @@ namespace DataLayer.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "IsTrusted", "Password", "RepPoints", "Role", "UserName" },
-                values: new object[] { 1, true, "12345", 1, "Admin", "Ivan Bakotin" });
+                values: new object[] { 1, true, "12345", 1000000, "Admin", "Ivan Bakotin" });
 
             migrationBuilder.InsertData(
                 table: "Resources",
