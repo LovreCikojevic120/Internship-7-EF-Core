@@ -1,6 +1,7 @@
 ﻿using DomainLayer.Queries;
 using DomainLayer.DatabaseEnums;
 using DomainLayer.Entities;
+using DataLayer.Entities.Models;
 
 namespace PresentationLayer.Entities
 {
@@ -13,29 +14,13 @@ namespace PresentationLayer.Entities
             var resourceCategory = ResourceTagSelect();
 
             if (resourceCategory == ResourceTag.None) return;
-            Printer.PrintResourceTagPosts(resourceCategory);
+
+            Printer.PrintResourceTagTitle(resourceCategory);
 
             var resourceQuery = new ResourceQueries();
-            
-
             var resourceList = resourceQuery.GetUserResources(resourceCategory);
 
-            if (resourceList is null || resourceList.Count is 0)
-            {
-                Printer.ConfirmMessage("Lista resursa prazna");
-                return;
-            }
-
-            foreach (var resource in resourceList)
-            {
-                Console.WriteLine($"ID:{resource.ResourceId} Tag: {resource.NameTag}\nSadrzaj:{resource.ResourceContent}\n" +
-                    $" Likes: {resource.NumberOfLikes} Dislikes: {resource.NumberOfDislikes}\n");
-
-                resourceQuery.AddUserResource(resource.ResourceId);
-
-                Console.WriteLine("Comments:\n");
-                PrintComments(resource.ResourceId, null, "\t");
-            }
+            PrintResources(resourceList, resourceQuery);
 
             ResourceInteract.StartInteraction();
         }
@@ -52,11 +37,26 @@ namespace PresentationLayer.Entities
                     Console.WriteLine(indent + $"ID: {comment.CommentId}\n{indent}Sadrzaj: {comment.CommentContent}\n" +
                         indent + $"Likes: {comment.NumberOfLikes} Dislikes: {comment.NumberOfDislikes}\n");
 
-                    indent += "\t";
-                    PrintComments(resourceId, comment.CommentId, indent);
+                    PrintComments(resourceId, comment.CommentId, indent + "\t");
 
                     commentQurey.AddUserComment(comment.CommentId);
                 }
+            }
+        }
+
+        private static void PrintResources(List<Resource>? resourceList, ResourceQueries resourceQuery)
+        {
+            if(resourceList is null || resourceList.Count == 0) return;
+
+            foreach (var resource in resourceList)
+            {
+                Console.WriteLine($"ID:{resource.ResourceId} Tag: {resource.NameTag}\nSadrzaj:{resource.ResourceContent}\n" +
+                    $" Likes: {resource.NumberOfLikes} Dislikes: {resource.NumberOfDislikes}\n");
+
+                resourceQuery.AddUserResource(resource.ResourceId);
+
+                Console.WriteLine("Comments:\n");
+                PrintComments(resource.ResourceId, null, "\t");
             }
         }
 
@@ -66,7 +66,7 @@ namespace PresentationLayer.Entities
 
             var resourceCategory = ResourceTagSelect();
             if (resourceCategory == ResourceTag.None) return;
-            Printer.PrintResourceTagPosts(resourceCategory);
+            Printer.PrintResourceTagTitle(resourceCategory);
 
             var resourceQuery = new ResourceQueries();
 
@@ -93,34 +93,28 @@ namespace PresentationLayer.Entities
                 Console.WriteLine($"{user.UserName} {user.Role} {user.RepPoints}");
 
             Printer.ConfirmMessage($"Korisnici dohvaceni");
+
+            if(DatabaseStateTracker.CurrentUser.Role == "Admin")
+                UserInteract.StartInteract();
         }
 
         private static ResourceTag ResourceTagSelect()
         {
-            var resourceTag = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
+            bool validInput;
 
             do
             {
-                switch (menuOption)
-                {
-                    case (int)ResourceTag.Dev:
-                        return ResourceTag.Dev;
-                    case (int)ResourceTag.Multimedija:
-                        return ResourceTag.Multimedija;
-                    case (int)ResourceTag.Dizajn:
-                        return ResourceTag.Dizajn;
-                    case (int)ResourceTag.Marketing:
-                        return ResourceTag.Marketing;
-                    case (int)ResourceTag.Generalno:
-                        return ResourceTag.Generalno;
-                    case (int)ResourceTag.None:
-                        return ResourceTag.None;
-                    default:
-                        return ResourceTag.None;
-                }
+                Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
 
+                if (Enum.IsDefined(typeof(ResourceTag), menuOption))
+                    return (ResourceTag)menuOption;
+
+                Console.WriteLine("Krivi unos");
+                validInput = false;
             }
-            while(resourceTag is false);
+            while(validInput is false);
+
+            return ResourceTag.None;
         }
 
         public static void GetUserInfo()
@@ -128,7 +122,8 @@ namespace PresentationLayer.Entities
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
             Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role} {currentUserInfo.RepPoints}");
 
-            Printer.ConfirmMessage($"Vasi podaci dohvaceni");
+            Printer.PrintUserSettingsMenu();
+            UserInteract.StartSettings();
         }
 
         public static void GetPopularEntities()
@@ -136,8 +131,6 @@ namespace PresentationLayer.Entities
             var resourceQuery = new ResourceQueries();
 
             var resourceList = resourceQuery.GetPopularResources();
-
-            Printer.ConfirmMessage("popular");
 
             if(resourceList is null)
             {

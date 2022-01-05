@@ -11,7 +11,7 @@
 
         public bool IsDeactivated { get; set; }
 
-        public DateTime DeactivatedUntil { get; set; }
+        public DateTime? DeactivatedUntil { get; set; }
 
         public ICollection<Comment> Comments { get; set; }  
         public ICollection<Resource> Resources { get; set; }
@@ -23,6 +23,8 @@
             Role = "Intern";
             RepPoints = 1;
             IsTrusted = false;
+            IsDeactivated = false;
+            DeactivatedUntil = null;
         }
         public User() { }
     }

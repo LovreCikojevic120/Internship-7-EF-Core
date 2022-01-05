@@ -43,9 +43,10 @@ namespace PresentationLayer.Entities
                         break;
                     default:
                         Printer.ConfirmMessage("Unos opcije izbornika neispravan");
+                        validInput = false;
                         break;
                 }
-            } while (!validInput);
+            } while (validInput is false);
         }
 
         private static void DeleteEntity()
@@ -142,13 +143,15 @@ namespace PresentationLayer.Entities
             var queri = new CommentQueries();
             var helpQuery = new HelperQueries();
 
-            Console.WriteLine("Koi id?");
+            Console.WriteLine("Upisite ID komentara:");
             var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
 
             if (hmm && helpQuery.IsComment(hm))
                 queri.ReplyOnComment(hm);
 
-            else Console.WriteLine("Komentar ne postoji!");
+            else Printer.ConfirmMessage("Komentar ne postoji");
+
+            Printer.ConfirmMessage("Uspjesno ste odgovorili na komentar");
         }
 
         private static void CreateResource()

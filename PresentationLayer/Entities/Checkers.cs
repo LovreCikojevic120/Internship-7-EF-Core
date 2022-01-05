@@ -4,8 +4,7 @@
     {
         public static bool CheckString(string suspectString, out string result)
         {
-            if (string.IsNullOrEmpty(suspectString) || string.IsNullOrWhiteSpace(suspectString) ||
-                suspectString.Length < 5)
+            if (string.IsNullOrWhiteSpace(suspectString) || suspectString.Length < 5)
             {
                 Printer.ConfirmMessage("Polje neispravno upisano");
                 result = string.Empty;

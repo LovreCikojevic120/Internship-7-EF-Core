@@ -45,7 +45,8 @@ namespace DomainLayer.Queries
 
         public List<Resource>? GetPopularResources()
         {
-            var resourceList = dataBase.Resources.OrderBy(n => n.NumberOfReplys).Take(5).ToList();
+            var resourceList = dataBase.Resources.Where(t=>t.TimeOfPosting.Date == DateTime.Today)
+                .OrderBy(n => n.NumberOfReplys).Take(5).ToList();
 
             if( resourceList is null || resourceList.Count is 0)
                 return null;
@@ -126,9 +127,9 @@ namespace DomainLayer.Queries
 
             commentQuery.AddComment(resourceId, null);
 
-            var userResource = dataBase.UserResources
-                .Single(ur => ur.ResourceId == resourceId && ur.UserId == DatabaseStateTracker.CurrentUser.UserId);
-            userResource.IsCommented = true;
+            dataBase.UserResources.Find(DatabaseStateTracker.CurrentUser.UserId, resourceId).IsCommented = true;
+            dataBase.Resources.Find(resourceId).NumberOfReplys++;
+
             dataBase.SaveChanges();
 
             return true;
@@ -142,10 +143,12 @@ namespace DomainLayer.Queries
 
             if (resourceUser is null) return;
 
-            var comments = dataBase.Comments.Where(c => c.ResourceId == resourceId).ToList();
+            var comments = dataBase.Comments
+                .Where(c => c.ParentCommentId == null && c.ResourceId == resourceId).ToList();
 
-            foreach (var comment in comments)
-                commentQuery.DeleteComment(comment.CommentId);
+            if (comments.Count > 0)
+                foreach (var comment in comments)
+                    commentQuery.DeleteComment(comment.CommentId);
 
             dataBase.UserResources.Remove(resourceUser);
             dataBase.Resources.Remove(resource);

@@ -1,4 +1,6 @@
 ﻿using DataLayer.Entities;
+using DataLayer.Entities.Models;
+using DomainLayer.DatabaseEnums;
 using DomainLayer.Entities;
 
 namespace DomainLayer.Queries
@@ -11,56 +13,61 @@ namespace DomainLayer.Queries
             dataBase = DbContextFactory.GetStackInternshipDbContext();
         }
 
-        private int CheckRepPoints(int points)
+        private void CheckPointsSubtraction(User user, int points)
         {
-            if (DatabaseStateTracker.CurrentUser.RepPoints - points < 1)
-            {
-                DatabaseStateTracker.CurrentUser.RepPoints = 1;
-                return 1;
-            }
-            return DatabaseStateTracker.CurrentUser.RepPoints -= points;
+            if (user.RepPoints - points < 1)
+                user.RepPoints = 1;
+
+            user.RepPoints -= points;
+            dataBase.SaveChanges();
+        }
+
+        private void CheckPointsAddition(User user, int points)
+        {
+            if (user.RepPoints + points >= (int)ReputationPoints.IsTrusted)
+                user.IsTrusted = true;
+
+            if (user.RepPoints + points >= (int)ReputationPoints.IsOrganizer)
+                user.Role = "Admin";
+
+            user.RepPoints += points;
+            dataBase.SaveChanges();
         }
 
         public void GetUpvoteResource()
         {
             var user = dataBase.Users.Single(u => u.UserId == DatabaseStateTracker.CurrentUser.UserId);
-            user.RepPoints += 10;
-            dataBase.SaveChanges();
+            CheckPointsAddition(user, 10);
         }
 
         public void GetUpvoteComment()
         {
             var user = dataBase.Users.Single(u => u.UserId == DatabaseStateTracker.CurrentUser.UserId);
-            user.RepPoints += 5;
-            dataBase.SaveChanges();
+            CheckPointsAddition(user, 5);
         }
 
         public void GiveUpvote(int userId)
         {
             var user = dataBase.Users.Single(u => u.UserId == userId);
-            user.RepPoints += 15;
-            dataBase.SaveChanges();
+            CheckPointsAddition(user, 15);
         }
 
         public void GetDownvotePoints()
         {
             var user = dataBase.Users.Single(u => u.UserId == DatabaseStateTracker.CurrentUser.UserId);
-            user.RepPoints = CheckRepPoints(5);
-            dataBase.SaveChanges();
+            CheckPointsSubtraction(user, 5);
         }
 
         public void GiveDownvoteResource(int userId)
         {
             var user = dataBase.Users.Single(u => u.UserId == userId);
-            user.RepPoints = CheckRepPoints(3);
-            dataBase.SaveChanges();
+            CheckPointsSubtraction(user, 3);
         }
 
         public void GiveDownvoteComment(int userId)
         {
             var user = dataBase.Users.Single(u => u.UserId == userId);
-            user.RepPoints = CheckRepPoints(2);
-            dataBase.SaveChanges();
+            CheckPointsSubtraction(user, 2);
         }
 
     }

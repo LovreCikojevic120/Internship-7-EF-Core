@@ -13,18 +13,21 @@ namespace PresentationLayer.Entities
 
             do
             {
+                Printer.PrintTitle("Registracija");
 
                 Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
                 validName = Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
+                if (possibleName.Count() is 0) return;
                 username = possibleName;
 
                 Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
                 validPassword = Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
+                if(possiblePass.Count() is 0) return;
                 password = possiblePass;
 
                 if (userQuery.UserExists(username))
                 {
-                    Console.WriteLine("Ime vec postoji!");
+                    Printer.ConfirmMessage("Vec postoji");
                     validName = false;
                 }
 
@@ -44,6 +47,7 @@ namespace PresentationLayer.Entities
 
             do
             {
+                Printer.PrintTitle("Login");
 
                 Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
                 username = Console.ReadLine().Trim();
@@ -60,7 +64,7 @@ namespace PresentationLayer.Entities
                     return;
                 }
 
-                Printer.ConfirmMessage($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu");
+                Printer.ConfirmMessage($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu ili je deaktiviran");
 
             } while (loginSuccess is false);
         }

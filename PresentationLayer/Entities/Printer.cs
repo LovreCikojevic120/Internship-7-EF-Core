@@ -4,11 +4,22 @@ namespace PresentationLayer.Entities
 {
     public static class Printer
     {
-        public static void PrintResourceTagPosts(ResourceTag resourceTag)
+        public static void PrintResourceTagTitle(ResourceTag resourceTag)
         {
             Console.Clear();
             Console.WriteLine($"==========\n{Enum.GetName(resourceTag).ToUpper()} POSTS\n==========\n");
         }
+
+        public static void PrintUserInteractMenu()
+        {
+            Console.WriteLine("1 - Deaktiviraj privremeno\n2 - Deaktiviraj trajno\n3 - Ponovno aktiviraj\n4 - Nazad na dashboard");
+        }
+
+        public static void PrintUserSettingsMenu()
+        {
+            Console.WriteLine("1 - Promijeni korisnicko ime\n2 - Promijeni lozinku\n");
+        }
+
         public static void PrintMainMenu()
         {
             Console.Clear();
@@ -39,6 +50,12 @@ namespace PresentationLayer.Entities
             Console.WriteLine($"{message}, za nastavak pritisnite bilo koju tipku!");
             Console.ReadKey();
             Console.Clear();
+        }
+
+        public static void PrintTitle(string message)
+        {
+            Console.Clear();
+            Console.WriteLine(message);
         }
 
 

@@ -101,17 +101,8 @@ namespace DomainLayer.Queries
             var subComments = dataBase.Comments.Where(c => c.ParentCommentId == commentToDelete.CommentId).ToList();
 
             if (subComments.Count() > 0)
-            {
-                foreach (var comment in subComments)
-                {
-                    var userComment = dataBase.UserComments.Where(c => c.CommentId == comment.CommentId).ToList();
-
-                    if (userComment.Count() > 0)
-                        dataBase.UserComments.RemoveRange(userComment);
-                }
-
-                dataBase.Comments.RemoveRange(subComments);
-            }
+                foreach (var subComment in subComments)
+                    DeleteComment(subComment.CommentId);
 
             dataBase.UserComments.Remove(userComm);
             dataBase.Comments.Remove(commentToDelete);

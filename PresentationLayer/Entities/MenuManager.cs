@@ -1,8 +1,4 @@
-﻿using PresentationLayer.Enums;
-using DomainLayer.Queries;
-using DomainLayer.Entities;
-
-namespace PresentationLayer.Entities
+﻿namespace PresentationLayer.Entities
 {
     public class MenuManager
     {
@@ -30,7 +26,7 @@ namespace PresentationLayer.Entities
                     Printer.ConfirmMessage("Izasli ste iz aplikacije");
                     return false;
                 default:
-                    Console.WriteLine("Neispravan unos!");
+                    Printer.ConfirmMessage("Neispravan unos");
                     break;
             }
             return true;
@@ -38,43 +34,44 @@ namespace PresentationLayer.Entities
 
         public static void DashboardSwitcher()
         {
+            bool isValidInput;
+
             do
             {
                 Printer.PrintDashboard();
 
-                var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
+                isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
 
-                if (!isValidInput)
+                if (isValidInput)
                 {
-                    Printer.ConfirmMessage("Unos opcije izbornika neispravan");
-                    return;
+                    switch (result)
+                    {
+                        case (int)Enums.DashboardOptions.Resources:
+                            DashboardHandler.PrintEntitiesByTag();
+                            break;
+                        case (int)Enums.DashboardOptions.Users:
+                            DashboardHandler.GetAllUsers();
+                            break;
+                        case (int)Enums.DashboardOptions.NoReplys:
+                            DashboardHandler.GetNoReplyEntities();
+                            break;
+                        case (int)Enums.DashboardOptions.Popular:
+                            DashboardHandler.GetPopularEntities();
+                            break;
+                        case (int)Enums.DashboardOptions.MyProfile:
+                            DashboardHandler.GetUserInfo();
+                            break;
+                        case (int)Enums.DashboardOptions.Logout:
+                            Printer.ConfirmMessage("Odjavljeni ste iz sustava");
+                            return;
+                        default:
+                            Printer.ConfirmMessage("Unijeli ste ne postojecu opciju");
+                            isValidInput = false;
+                            break;
+                    }
                 }
 
-                switch (result)
-                {
-                    case (int)Enums.DashboardOptions.Resources:
-                        DashboardHandler.PrintEntitiesByTag();
-                        break;
-                    case (int)Enums.DashboardOptions.Users:
-                        DashboardHandler.GetAllUsers();
-                        break;
-                    case (int)Enums.DashboardOptions.NoReplys:
-                        DashboardHandler.GetNoReplyEntities();
-                        break;
-                    case (int)Enums.DashboardOptions.Popular:
-                        DashboardHandler.GetPopularEntities();
-                        break;
-                    case (int)Enums.DashboardOptions.MyProfile:
-                        DashboardHandler.GetUserInfo();
-                        break;
-                    case (int)Enums.DashboardOptions.Logout:
-                        Printer.ConfirmMessage("Odjavljeni ste iz sustava");
-                        return;
-                    default:
-                        Printer.ConfirmMessage("Unijeli ste ne postojecu opciju");
-                        break;
-                }
-            } while (true);
+            } while (isValidInput);
         }
     }
 }
