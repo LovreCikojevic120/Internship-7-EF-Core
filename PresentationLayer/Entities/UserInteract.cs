@@ -26,7 +26,7 @@ namespace PresentationLayer.Entities
                         Reactivate();
                         break;
                     default:
-                        Printer.ConfirmMessage("Krivi unos!");
+                        Printer.ConfirmMessageAndClear("Krivi unos!");
                         break;
                 }
             }
@@ -51,7 +51,7 @@ namespace PresentationLayer.Entities
                         EditPassword();
                         break;
                     default:
-                        Printer.ConfirmMessage("Krivi unos!");
+                        Printer.ConfirmMessageAndClear("Krivi unos!");
                         break;
                 }
             }

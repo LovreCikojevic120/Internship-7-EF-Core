@@ -7,13 +7,13 @@ namespace PresentationLayer.Entities
 {
     public static class DashboardHandler
     {
-        public static void PrintEntitiesByTag()
+        public static bool PrintEntitiesByTag(ResourceTag resourceCategory)
         {
+            var resourceInteract = new ResourceInteract();
+
             Printer.PrintEntityTagList();
 
-            var resourceCategory = ResourceTagSelect();
-
-            if (resourceCategory == ResourceTag.None) return;
+            if (resourceCategory == ResourceTag.None) return false;
 
             Printer.PrintResourceTagTitle(resourceCategory);
 
@@ -22,7 +22,10 @@ namespace PresentationLayer.Entities
 
             PrintResources(resourceList, resourceQuery);
 
-            ResourceInteract.StartInteraction();
+            if (resourceInteract.StartInteraction())
+                return false;
+
+            return true;
         }
 
         private static void PrintComments(int resourceId, int? parentCommentId, string indent)
@@ -60,12 +63,14 @@ namespace PresentationLayer.Entities
             }
         }
 
-        public static void GetNoReplyEntities()
+        public static bool GetNoReplyEntities(ResourceTag resourceCategory)
         {
+            var resourceInteract = new ResourceInteract();
+
             Printer.PrintEntityTagList();
 
-            var resourceCategory = ResourceTagSelect();
-            if (resourceCategory == ResourceTag.None) return;
+            if (resourceCategory == ResourceTag.None) return false;
+
             Printer.PrintResourceTagTitle(resourceCategory);
 
             var resourceQuery = new ResourceQueries();
@@ -74,17 +79,19 @@ namespace PresentationLayer.Entities
 
             if (resourceList is null || resourceList.Count is 0)
             {
-                Printer.ConfirmMessage("Lista resursa prazna");
-                return;
+                Printer.ConfirmMessageAndClear("Lista resursa prazna");
+                return false;
             }
 
-            foreach (var resource in resourceList)
-                Console.WriteLine($"{resource.ResourceContent} {resource.NameTag}");
+            PrintResources(resourceList, resourceQuery);
 
-            ResourceInteract.StartInteraction();
+            if(resourceInteract.StartInteraction())
+                return false;
+
+            return true;
         }
 
-        public static void GetAllUsers()
+        public static bool GetAllUsers()
         {
             var userQuery = new UserQueries();
             var usersList = userQuery.ReadAllUsers();
@@ -92,56 +99,62 @@ namespace PresentationLayer.Entities
             foreach (var user in usersList)
                 Console.WriteLine($"{user.UserName} {user.Role} {user.RepPoints}");
 
-            Printer.ConfirmMessage($"Korisnici dohvaceni");
-
             if(DatabaseStateTracker.CurrentUser.Role == "Admin")
                 UserInteract.StartInteract();
+
+            Printer.ConfirmMessageAndClear("Gotovo");
+            return false;
         }
 
-        private static ResourceTag ResourceTagSelect()
+        public static bool ResourceTagSelect()
         {
-            bool validInput;
+            Printer.PrintEntityTagList();
 
-            do
+            Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
+
+            if (Enum.IsDefined(typeof(ResourceTag), menuOption))
             {
-                Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
-
-                if (Enum.IsDefined(typeof(ResourceTag), menuOption))
-                    return (ResourceTag)menuOption;
-
-                Console.WriteLine("Krivi unos");
-                validInput = false;
+                DatabaseStateTracker.currentResourceTag = (ResourceTag)menuOption;
+                return false;
             }
-            while(validInput is false);
 
-            return ResourceTag.None;
+            Console.WriteLine("Krivi unos");
+            DatabaseStateTracker.currentResourceTag = ResourceTag.None;
+            return true;
         }
 
-        public static void GetUserInfo()
+        public static bool GetUserInfo()
         {
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
             Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role} {currentUserInfo.RepPoints}");
 
             Printer.PrintUserSettingsMenu();
             UserInteract.StartSettings();
+
+            return false;
         }
 
-        public static void GetPopularEntities()
+        public static bool GetPopularEntities()
         {
+            var resourceInteract = new ResourceInteract();
             var resourceQuery = new ResourceQueries();
-
             var resourceList = resourceQuery.GetPopularResources();
 
             if(resourceList is null)
             {
-                Printer.ConfirmMessage("Lista resursa prazna");
-                return;
+                Printer.ConfirmMessageAndClear("Lista resursa prazna");
+                return false;
             }
 
             foreach(var resource in resourceList)
                 Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
 
-            ResourceInteract.StartInteraction();
+            if (resourceInteract.StartInteraction())
+                return false;
+
+            return true;
         }
+
+        
     }
 }

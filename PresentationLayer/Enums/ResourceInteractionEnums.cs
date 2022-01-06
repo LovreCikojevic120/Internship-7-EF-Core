@@ -2,13 +2,13 @@
 {
     public enum ResourceInteraction
     {
-        New = 0,
-        Comment = 1,
-        Reply = 2,
-        Like = 3,
-        Dislike = 4,
-        Edit = 5,
-        Delete = 6,
-        None = 7
+        New = 1,
+        Comment = 2,
+        Reply = 3,
+        Like = 4,
+        Dislike = 5,
+        Edit = 6,
+        Delete = 7,
+        None = 8
     }    
 }

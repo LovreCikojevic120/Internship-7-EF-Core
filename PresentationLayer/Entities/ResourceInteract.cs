@@ -1,165 +1,197 @@
-﻿using DomainLayer.DatabaseEnums;
-using DomainLayer.Entities;
+﻿using DomainLayer.Entities;
 using DomainLayer.Queries;
 using PresentationLayer.Enums;
 
 namespace PresentationLayer.Entities
 {
-    public static class ResourceInteract
+    public class ResourceInteract
     {
-        public static void StartInteraction()
+        private CommentQueries commentQuery = new();
+        private ResourceQueries resourceQuery = new();
+        private HelperQueries helpQuery = new();
+
+        public bool StartInteraction()
         {
             Printer.PrintResourceInteractMenu(DatabaseStateTracker.CurrentUser.Role);
 
             var validInput = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int result);
 
-            do
+            if (!validInput) return false;
+
+            switch (result)
             {
-                switch (result)
-                {
-                    case (int)ResourceInteraction.New:
-                        CreateResource();
-                        break;
-                    case (int)ResourceInteraction.Comment:
-                        Comment();
-                        break;
-                    case (int)ResourceInteraction.Reply:
-                        Reply();
-                        break;
-                    case (int)ResourceInteraction.Like:
-                        LikeEntity();
-                        break;
-                    case (int)ResourceInteraction.Dislike:
-                        DislikeEntity();
-                        break;
-                    case (int)ResourceInteraction.Edit:
-                        EditEntity();
-                        break;
-                    case (int)ResourceInteraction.Delete:
-                        DeleteEntity();
-                        break;
-                    case (int)ResourceInteraction.None:
-                        Printer.ConfirmMessage("Vracate se na dashboard");
-                        break;
-                    default:
-                        Printer.ConfirmMessage("Unos opcije izbornika neispravan");
-                        validInput = false;
-                        break;
-                }
-            } while (validInput is false);
+                case (int)ResourceInteraction.New:
+                    CreateResource();
+                    break;
+                case (int)ResourceInteraction.Comment:
+                    Comment();
+                    break;
+                case (int)ResourceInteraction.Reply:
+                    Reply();
+                    break;
+                case (int)ResourceInteraction.Like:
+                    LikeEntity();
+                    break;
+                case (int)ResourceInteraction.Dislike:
+                    DislikeEntity();
+                    break;
+                case (int)ResourceInteraction.Edit:
+                    EditEntity();
+                    break;
+                case (int)ResourceInteraction.Delete:
+                    DeleteEntity();
+                    break;
+                case (int)ResourceInteraction.None:
+                    Printer.ConfirmMessageAndClear("Vracate se na dashboard");
+                    return true;
+                default:
+                    Printer.ConfirmMessageAndClear("Unos opcije izbornika neispravan");
+                    return false;
+            }
+            return false;
         }
 
-        private static void DeleteEntity()
+        private void DeleteEntity()
         {
-            var commentQuery = new CommentQueries();
-            var resourceQuery = new ResourceQueries();
-            var helpQuery = new HelperQueries();
+            Console.WriteLine("Upisite ID resursa:");
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            Console.WriteLine("Koi id?");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            if (validId && helpQuery.IsResource(entityId))
+            {
+                resourceQuery.DeleteResource(entityId);
+                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} izbrisan");
+                return;
+            }
 
-            if (hmm && helpQuery.IsResource(hm))
-                resourceQuery.DeleteResource(hm);
+            if (validId && helpQuery.IsComment(entityId))
+            {
+                commentQuery.DeleteComment(entityId);
+                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} izbrisan");
+                return;
+            }
 
-            if (hmm && helpQuery.IsComment(hm))
-                commentQuery.DeleteComment(hm);
-
-            else Console.WriteLine("yikes");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji");
         }
 
-        private static void EditEntity()
+        private void EditEntity()
         {
-            var commentQuery = new CommentQueries();
-            var resourceQuery = new ResourceQueries();
-            var helpQuery = new HelperQueries();
-
-            Console.WriteLine("Koi id?");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
-            Console.WriteLine("NOvi sardzaj");
+            Console.WriteLine("Upisite ID resursa:");
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
+            Console.WriteLine("Upisite novi sadrzaj resursa:");
             var validString = Checkers.CheckString(Console.ReadLine(), out string newContent);
 
-            if (hmm && helpQuery.IsResource(hm))
-                resourceQuery.EditResource(hm, newContent);
+            if (validId && helpQuery.IsResource(entityId) && validString)
+            {
+                resourceQuery.EditResource(entityId, newContent);
+                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} ureden");
+                return;
+            }
 
-            if (hmm && helpQuery.IsComment(hm))
-                commentQuery.EditComment(hm, newContent);
+            if (validId && helpQuery.IsComment(entityId) && validString)
+            {
+                commentQuery.EditComment(entityId, newContent);
+                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} ureden");
+                return;
+            }
 
-            else Console.WriteLine("yikes");
+            Printer.ConfirmMessageAndClear("Greska");
         }
 
-        private static void DislikeEntity()
+        private void DislikeEntity()
         {
-            var commentQuery = new CommentQueries();
-            var resourceQuery = new ResourceQueries();
-            var helpQuery = new HelperQueries();
+            Console.WriteLine("Upisite ID:");
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            Console.WriteLine("Koi id?");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            if (validId && helpQuery.IsResource(entityId))
+            {
+                resourceQuery.DislikeResource(entityId);
+                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} oznacen sa 'ne svida mi se'");
+                return;
+            }
 
-            if (hmm && helpQuery.IsResource(hm))
-                resourceQuery.DislikeResource(hm);
+            if (validId && helpQuery.IsComment(entityId)) 
+            { 
+                commentQuery.DislikeComment(entityId);
+                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} oznacen sa 'ne svida mi se'");
+                return;
+            }
 
-            if (hmm && helpQuery.IsComment(hm))
-                commentQuery.DislikeComment(hm);
-
-            else Console.WriteLine("yikes");
+            Printer.ConfirmMessageAndClear("Greska");
         }
 
-        private static void LikeEntity()
+        private void LikeEntity()
         {
-            var commentQuery = new CommentQueries();
-            var resourceQuery = new ResourceQueries();
-            var helpQuery = new HelperQueries();
+            Console.WriteLine("Upisite ID:");
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            Console.WriteLine("Koi id?");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            if (validId && helpQuery.IsResource(entityId))
+            {
+                resourceQuery.LikeResource(entityId);
+                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} oznacen sa 'svida mi se'");
+                return;
+            }
 
-            if (hmm && helpQuery.IsResource(hm))
-                resourceQuery.LikeResource(hm);
+            if (validId && helpQuery.IsComment(entityId))
+            {
+                commentQuery.LikeComment(entityId);
+                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} oznacen sa 'svida mi se'");
+                return;
+            }
 
-            if (hmm && helpQuery.IsComment(hm))
-                commentQuery.LikeComment(hm);
-
-            else Console.WriteLine("Resurs ne postoji!");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji!");
         }
 
-        private static void Comment()
+        private void Comment()
         {
-            var resourceQuery = new ResourceQueries();
-            var helpQuery = new HelperQueries();
+            Console.WriteLine("Upisite ID resursa:");
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            Console.WriteLine("Koi id?");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            Console.WriteLine("Upisite sadrzaj odgovora:");
+            var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
 
-            if (hmm && helpQuery.IsResource(hm))
-                resourceQuery.CommentResource(hm);
-
-            else Console.WriteLine("yikes");
+            if (validId && helpQuery.IsResource(entityId))
+            {
+                resourceQuery.CommentResource(entityId, content);
+                Printer.ConfirmMessageAndClear($"Komentar dodan na resurs {entityId}");
+                return;
+            }
+                
+            Printer.ConfirmMessageAndClear("Greska");
 
         }
 
-        private static void Reply()
+        private void Reply()
         {
-            var queri = new CommentQueries();
-            var helpQuery = new HelperQueries();
 
             Console.WriteLine("Upisite ID komentara:");
-            var hmm = Checkers.CheckForNumber(Console.ReadLine(), out int hm);
+            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            if (hmm && helpQuery.IsComment(hm))
-                queri.ReplyOnComment(hm);
+            Console.WriteLine("Upisite sadrzaj odgovora:");
+            var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
 
-            else Printer.ConfirmMessage("Komentar ne postoji");
+            if (validId && validInput && helpQuery.IsComment(entityId))
+            {
+                commentQuery.ReplyOnComment(entityId, content);
+                Printer.ConfirmMessageAndClear($"Odgovor dodan na komentar {entityId}");
+                return;
+            }
 
-            Printer.ConfirmMessage("Uspjesno ste odgovorili na komentar");
+            Printer.ConfirmMessageAndClear("Komentar ne postoji");
         }
 
-        private static void CreateResource()
+        private void CreateResource()
         {
-            var resourceQuery = new ResourceQueries();
-            Console.WriteLine("Sadrzaj:");
-            var content = Console.ReadLine();
-            resourceQuery.CreateResource(content);
+            Console.WriteLine("Upisite sadrzaj novog resursa:");
+            var validString = Checkers.CheckString(Console.ReadLine(), out string content);
+
+            if (validString)
+            {
+                resourceQuery.CreateResource(content);
+                Printer.ConfirmMessageAndClear("Resurs uspjesno dodan");
+                return;
+            }
+
+            Printer.ConfirmMessageAndClear("Greska");
         }
     }
 }

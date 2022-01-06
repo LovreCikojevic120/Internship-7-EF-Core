@@ -4,12 +4,7 @@
     {
         static void Main()
         {
-            var notExit = false;
-            do
-            {
-                notExit = MenuManager.MainMenuSwitcher();
-
-            }while(notExit);
+            TaskManager.Test(MenuManager.MainMenuSwitcher);
         }
     }
 }

@@ -113,7 +113,7 @@ namespace DomainLayer.Queries
             dataBase.SaveChanges();
         }
 
-        public bool CommentResource(int resourceId)
+        public bool CommentResource(int resourceId, string content)
         {
             var helpQuery = new HelperQueries();
             var commentQuery = new CommentQueries();
@@ -125,7 +125,7 @@ namespace DomainLayer.Queries
                 return false;
             }
 
-            commentQuery.AddComment(resourceId, null);
+            commentQuery.AddComment(resourceId, null, content);
 
             dataBase.UserResources.Find(DatabaseStateTracker.CurrentUser.UserId, resourceId).IsCommented = true;
             dataBase.Resources.Find(resourceId).NumberOfReplys++;
@@ -138,10 +138,11 @@ namespace DomainLayer.Queries
         public void DeleteResource(int resourceId)
         {
             var resource = dataBase.Resources.Find(resourceId);
-            var resourceUser = dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId);
-            var commentQuery = new CommentQueries();
+            var resourceUser = dataBase.UserResources
+                .Where(ur => ur.UserId == resource.ResourceOwnerId && ur.ResourceId == resourceId).FirstOrDefault();
+            if (resource is null || resourceUser is null) return;
 
-            if (resourceUser is null) return;
+            var commentQuery = new CommentQueries();
 
             var comments = dataBase.Comments
                 .Where(c => c.ParentCommentId == null && c.ResourceId == resourceId).ToList();
@@ -168,7 +169,8 @@ namespace DomainLayer.Queries
         public void EditResource(int resourceId, string newContent)
         {
             var resource = dataBase.Resources.Find(resourceId);
-            if (resource is null || dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId) is null) return;
+            if (resource is null || dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId) is null)
+                return;
 
             resource.ResourceContent = newContent;
             dataBase.SaveChanges();

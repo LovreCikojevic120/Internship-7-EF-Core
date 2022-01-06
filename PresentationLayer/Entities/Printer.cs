@@ -29,8 +29,8 @@ namespace PresentationLayer.Entities
 
         internal static void PrintResourceInteractMenu(string userRole)
         {
-            Console.WriteLine("Izaberite jednu od akcija:\n1 - Komentiraj post\n2 - Odgovori na komentar\n" +
-                "3 - Lajkaj\n4 - Dislajkaj\n5 - Nazad na dashboard\n");
+            Console.WriteLine("Izaberite jednu od akcija:\n1 - Novi post\t2 - Odgovori na post\t3 - Odgovori na komentar\n" +
+                "4 - Lajkaj\t5 - Dislajkaj\n6 - Uredi\t7 - Izbrisi\n8 - Nazad na dashboard");
         }
 
         public static void PrintDashboard()
@@ -45,11 +45,17 @@ namespace PresentationLayer.Entities
             Console.WriteLine("1 - Dev\n2 - Dizajn\n3 - Marketing\n4 - Multimedija\n5 - Generalno\n6 - Nazad na dashboard\n");
         }
 
-        public static void ConfirmMessage(string message)
+        public static void ConfirmMessageAndClear(string message)
         {
             Console.WriteLine($"{message}, za nastavak pritisnite bilo koju tipku!");
             Console.ReadKey();
             Console.Clear();
+        }
+
+        public static void ConfirmMessage(string message)
+        {
+            Console.WriteLine(message);
+            Console.ReadKey();
         }
 
         public static void PrintTitle(string message)

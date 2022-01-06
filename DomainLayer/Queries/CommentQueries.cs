@@ -14,7 +14,7 @@ namespace DomainLayer.Queries
             dataBase = DbContextFactory.GetStackInternshipDbContext();
         }
 
-        public void LikeComment(int commentId)
+        public bool LikeComment(int commentId)
         {
             var reputationQuery = new ReputationQueries();
             var helpQuery = new HelperQueries();
@@ -22,8 +22,7 @@ namespace DomainLayer.Queries
             if (helpQuery.IsVoted(commentId) || 
                 DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote)
             {
-                Console.WriteLine("vec ste lajkali");
-                return;
+                return false;
             }
 
             var comment = dataBase.Comments.Single(r => r.CommentId == commentId);
@@ -33,10 +32,10 @@ namespace DomainLayer.Queries
             reputationQuery.GiveUpvote(comment.CommentOwnerId);
             reputationQuery.GetUpvoteComment();
 
-            
+            return true;
         }
 
-        public void DislikeComment(int commentId)
+        public bool DislikeComment(int commentId)
         {
             var helpQuery = new HelperQueries();
             var reputationQuery = new ReputationQueries();
@@ -45,7 +44,7 @@ namespace DomainLayer.Queries
                 DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteComment)
             {
                 Console.WriteLine("vec ste lajkali");
-                return;
+                return false;
             }
 
             var comment = dataBase.Comments.Find(commentId);
@@ -54,16 +53,16 @@ namespace DomainLayer.Queries
 
             reputationQuery.GiveDownvoteComment(comment.CommentOwnerId);
             reputationQuery.GetDownvotePoints();
+
+            return true;
         }
 
-        public bool ReplyOnComment(int commentId)
+        public bool ReplyOnComment(int commentId, string content)
         {
             var helpQuery = new HelperQueries();
-            var reputationQuery = new ReputationQueries();
 
             if (helpQuery.IsCommented(commentId) || DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply)
             {
-                Console.WriteLine("Vec ste komentirali ili nemate dovoljno bodova");
                 return false;
             }
 
@@ -72,41 +71,41 @@ namespace DomainLayer.Queries
             if(resourceId == null)
                 return false;
 
-            AddComment((int)resourceId, commentId);
+            AddComment((int)resourceId, commentId, content);
 
-            var userComment = dataBase.UserComments
-                .Single(uc => uc.CommentId == commentId && uc.UserId==DatabaseStateTracker.CurrentUser.UserId);
-            userComment.IsCommented = true;
+            dataBase.UserComments.Find(DatabaseStateTracker.CurrentUser.UserId, commentId).IsCommented = true;
 
             dataBase.SaveChanges();
             return true;
         }
 
-        public void AddComment(int resourceId, int? parentCommentId)
+        public void AddComment(int resourceId, int? parentCommentId, string commentContent)
         {
-            Console.WriteLine("Upisi komentar");
-            var commentContent = Console.ReadLine().Trim();
             Comment comment = new Comment(DatabaseStateTracker.GenerateEntityId(), commentContent, 0, 0, DatabaseStateTracker.CurrentUser.UserId, resourceId, parentCommentId);
             dataBase.Add(comment);
             dataBase.SaveChanges();
         }
 
-        public void DeleteComment(int commentId)
+        public bool DeleteComment(int commentId)
         {
             var commentToDelete = dataBase.Comments.Find(commentId);
             var userComm = dataBase.UserComments.Find(commentToDelete.CommentOwnerId, commentToDelete.CommentId);
 
-            if (commentToDelete is null || userComm is null) return;
+            if (commentToDelete is null || userComm is null) return false;
 
-            var subComments = dataBase.Comments.Where(c => c.ParentCommentId == commentToDelete.CommentId).ToList();
+            dataBase.UserComments.Remove(userComm);
+            dataBase.SaveChanges();
+
+            var subComments = GetSubComments(commentId);
 
             if (subComments.Count() > 0)
                 foreach (var subComment in subComments)
                     DeleteComment(subComment.CommentId);
 
-            dataBase.UserComments.Remove(userComm);
             dataBase.Comments.Remove(commentToDelete);
             dataBase.SaveChanges();
+
+            return true;
         }
 
         public void AddUserComment(int commentId)
@@ -119,13 +118,16 @@ namespace DomainLayer.Queries
             dataBase.SaveChanges();
         }
 
-        public void EditComment(int commentId, string newContent)
+        public bool EditComment(int commentId, string newContent)
         {
             var comment = dataBase.Comments.Find(commentId);
-            if (comment is null || dataBase.UserComments.Find(comment.CommentOwnerId, commentId) is null) return;
+            if (comment is null || dataBase.UserComments.Find(comment.CommentOwnerId, commentId) is null) 
+                return false;
 
             comment.CommentContent = newContent;
             dataBase.SaveChanges();
+
+            return true;
         }
 
         public List<Comment> GetResourceComments(int resourceId, int? parentCommentId)

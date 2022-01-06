@@ -5,68 +5,64 @@ namespace PresentationLayer.Entities
 {
     public static class MainMenuHandler
     {
-        public static void Register()
+        public static bool Register()
         {
             string username, password;
             bool validName, validPassword;
             var userQuery = new UserQueries();
 
-            do
+            Printer.PrintTitle("Registracija");
+
+            Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
+            validName = Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
+            if (possibleName.Count() is 0) return false;
+            username = possibleName;
+
+            Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
+            validPassword = Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
+            if (possiblePass.Count() is 0) return false;
+            password = possiblePass;
+
+            if (userQuery.UserExists(username) || !validName || !validPassword)
             {
-                Printer.PrintTitle("Registracija");
-
-                Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
-                validName = Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
-                if (possibleName.Count() is 0) return;
-                username = possibleName;
-
-                Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
-                validPassword = Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
-                if(possiblePass.Count() is 0) return;
-                password = possiblePass;
-
-                if (userQuery.UserExists(username))
-                {
-                    Printer.ConfirmMessage("Vec postoji");
-                    validName = false;
-                }
-
-            } while (validName is false || validPassword is false);
-
+                Printer.ConfirmMessageAndClear("Vec postoji");
+                return true;
+            }
+            
             userQuery.Register(username, password);
-            Printer.ConfirmMessage("Uspjesno ste registrirani");
+            Printer.ConfirmMessageAndClear("Uspjesno ste registrirani");
 
-            MenuManager.DashboardSwitcher();
+            TaskManager.Test(MenuManager.DashboardSwitcher);
+            return false;
         }
 
-        public static void Login()
+        public static bool Login()
         {
             string username, password;
             bool loginSuccess;
             UserQueries queries = new UserQueries();
 
-            do
+            Printer.PrintTitle("Login");
+
+            Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
+            username = Console.ReadLine().Trim();
+            if (username.Count() is 0) return false;
+
+            Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
+            password = Console.ReadLine().Trim();
+            if (password.Count() is 0) return false;
+
+            loginSuccess = queries.Login(username, password);
+
+            if (loginSuccess is true)
             {
-                Printer.PrintTitle("Login");
+                Printer.ConfirmMessageAndClear($"Uspjesno ste prijavljeni kao: {DatabaseStateTracker.CurrentUser.UserName}");
+                TaskManager.Test(MenuManager.DashboardSwitcher);
+                return false;
+            }
 
-                Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
-                username = Console.ReadLine().Trim();
-
-                Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
-                password = Console.ReadLine().Trim();
-
-                loginSuccess = queries.Login(username, password);
-
-                if (loginSuccess is true)
-                {
-                    Printer.ConfirmMessage($"Uspjesno ste prijavljeni kao: {DatabaseStateTracker.CurrentUser.UserName}");
-                    MenuManager.DashboardSwitcher();
-                    return;
-                }
-
-                Printer.ConfirmMessage($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu ili je deaktiviran");
-
-            } while (loginSuccess is false);
+            Printer.ConfirmMessageAndClear($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu ili je deaktiviran");
+            return true;
         }
     }
 }
