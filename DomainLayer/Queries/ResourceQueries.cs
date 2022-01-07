@@ -87,6 +87,8 @@ namespace DomainLayer.Queries
             dataBase.SaveChanges();
 
             AddUserResource(newResource.ResourceId);
+
+            dataBase.SaveChanges();
         }
 
         public bool DislikeResource(int resourceId)
@@ -107,6 +109,7 @@ namespace DomainLayer.Queries
             reputationQuery.GiveDownvoteResource(resource.ResourceOwnerId);
             reputationQuery.GetDownvotePoints();
 
+            dataBase.SaveChanges();
             return true;
         }
 
@@ -150,7 +153,6 @@ namespace DomainLayer.Queries
             if (helpQuery.IsResource(resourceId) is false) return false;
 
             var comments = dataBase.Comments.Where(c=>c.ResourceId == resourceId).ToList();
-            if (comments.Count() is 0) return false;
 
             foreach(var comment in comments)
             {

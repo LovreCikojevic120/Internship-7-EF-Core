@@ -56,18 +56,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("ResourceId");
 
                     b.ToTable("Comments");
-
-                    b.HasData(
-                        new
-                        {
-                            CommentId = 3,
-                            CommentContent = "Fritule su bezveze",
-                            CommentOwnerId = 2,
-                            NumberOfDislikes = 4,
-                            NumberOfLikes = 4,
-                            ResourceId = 1,
-                            TimeOfPosting = new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Models.Resource", b =>
@@ -103,30 +91,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("ResourceOwnerId");
 
                     b.ToTable("Resources");
-
-                    b.HasData(
-                        new
-                        {
-                            ResourceId = 1,
-                            NameTag = "Dev",
-                            NumberOfDislikes = 4,
-                            NumberOfLikes = 4,
-                            NumberOfReplys = 1,
-                            ResourceContent = "Fritule su najbolje slatko",
-                            ResourceOwnerId = 1,
-                            TimeOfPosting = new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            ResourceId = 2,
-                            NameTag = "Generalno",
-                            NumberOfDislikes = 4,
-                            NumberOfLikes = 4,
-                            NumberOfReplys = 0,
-                            ResourceContent = "Krokanti su najbolje slatko",
-                            ResourceOwnerId = 1,
-                            TimeOfPosting = new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Models.User", b =>
@@ -207,15 +171,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("CommentId");
 
                     b.ToTable("UserComments");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = 1,
-                            CommentId = 3,
-                            IsCommented = false,
-                            IsVoted = false
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Models.UserResource", b =>
@@ -237,15 +192,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("ResourceId");
 
                     b.ToTable("UserResources");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = 1,
-                            ResourceId = 1,
-                            IsCommented = true,
-                            IsVoted = false
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Models.Comment", b =>

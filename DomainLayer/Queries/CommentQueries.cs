@@ -29,6 +29,7 @@ namespace DomainLayer.Queries
             reputationQuery.GiveUpvote(comment.CommentOwnerId);
             reputationQuery.GetUpvoteComment();
 
+            dataBase.SaveChanges();
             return true;
         }
 
@@ -44,6 +45,7 @@ namespace DomainLayer.Queries
             reputationQuery.GiveDownvoteComment(comment.CommentOwnerId);
             reputationQuery.GetDownvotePoints();
 
+            dataBase.SaveChanges();
             return true;
         }
 

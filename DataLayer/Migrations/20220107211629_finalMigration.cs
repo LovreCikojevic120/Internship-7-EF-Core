@@ -137,31 +137,6 @@ namespace DataLayer.Migrations
                 columns: new[] { "UserId", "DeactivatedUntil", "IsDeactivated", "IsTrusted", "Password", "RepPoints", "Role", "UserName" },
                 values: new object[] { 2, null, false, false, "Lozinka", 1, "Intern", "Ivan Ivic" });
 
-            migrationBuilder.InsertData(
-                table: "Resources",
-                columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
-                values: new object[] { 1, "Dev", 4, 4, 1, "Fritule su najbolje slatko", 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
-
-            migrationBuilder.InsertData(
-                table: "Resources",
-                columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
-                values: new object[] { 2, "Generalno", 4, 4, 0, "Krokanti su najbolje slatko", 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
-
-            migrationBuilder.InsertData(
-                table: "Comments",
-                columns: new[] { "CommentId", "CommentContent", "CommentOwnerId", "NumberOfDislikes", "NumberOfLikes", "ParentCommentId", "ResourceId", "TimeOfPosting" },
-                values: new object[] { 3, "Fritule su bezveze", 2, 4, 4, null, 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
-
-            migrationBuilder.InsertData(
-                table: "UserResources",
-                columns: new[] { "ResourceId", "UserId", "IsCommented", "IsVoted" },
-                values: new object[] { 1, 1, true, false });
-
-            migrationBuilder.InsertData(
-                table: "UserComments",
-                columns: new[] { "CommentId", "UserId", "IsCommented", "IsVoted" },
-                values: new object[] { 3, 1, false, false });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_CommentOwnerId",
                 table: "Comments",

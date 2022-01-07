@@ -41,7 +41,7 @@ namespace DomainLayer.Queries
         {
             var user = dataBase.Users.Find(userId);
 
-            if (user is null)
+            if (user is null || user == DatabaseStateTracker.CurrentUser)
                 return false;
 
             user.IsDeactivated = true;
@@ -66,7 +66,7 @@ namespace DomainLayer.Queries
         {
             var user = dataBase.Users.Find(userId);
 
-            if (user is null) return false;
+            if (user is null || user == DatabaseStateTracker.CurrentUser) return false;
 
             user.IsDeactivated = true;
             user.DeactivatedUntil = null;
