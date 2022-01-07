@@ -7,7 +7,7 @@ namespace DomainLayer.Entities
     {
         public static User? CurrentUser;
 
-        public static ResourceTag currentResourceTag = ResourceTag.None;
+        public static ResourceTag currentResourceTag = ResourceTag.Generalno;
 
         public static int GenerateEntityId()
         {

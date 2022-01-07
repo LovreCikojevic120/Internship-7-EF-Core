@@ -1,5 +1,6 @@
 ﻿using DataLayer.Entities;
 using DomainLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DomainLayer.Queries
 {
@@ -22,20 +23,27 @@ namespace DomainLayer.Queries
 
         public string? GetAuthorName(int? resourceId, int? commentId)
         {
-            if (commentId is null)
+            if (commentId is null) {
+                var resource = dataBase.Resources.Find(resourceId);
+
                 return dataBase.UserResources.Join(dataBase.Users, ur => ur.UserId, u => u.UserId, (ur, u) => new
                 {
                     ur.ResourceId,
-                    u.UserName
+                    u.UserName,
+                    u.UserId
 
-                }).Where(r => r.ResourceId == resourceId).Select(un=>un.UserName).FirstOrDefault();
+                }).Where(r => r.ResourceId == resourceId && r.UserId==resource.ResourceOwnerId).Select(un => un.UserName).FirstOrDefault();
+            }
+
+            var comment = dataBase.Comments.Find(commentId);
 
             return dataBase.UserComments.Join(dataBase.Users, c => c.UserId, uc => uc.UserId, (c, uc) => new
             {
                 c.CommentId,
-                uc.UserName
+                uc.UserName,
+                uc.UserId
 
-            }).Where(c => c.CommentId == commentId).Select(un => un.UserName).FirstOrDefault();
+            }).Where(c => c.CommentId == commentId && c.UserId==comment.CommentOwnerId).Select(un => un.UserName).FirstOrDefault();
         }
 
         public bool IsResource(int entityId)

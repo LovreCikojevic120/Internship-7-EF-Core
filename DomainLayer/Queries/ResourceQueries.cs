@@ -29,8 +29,6 @@ namespace DomainLayer.Queries
             if(resourceList is null)
                 return null;
 
-            
-
             var list = new List<(Resource, string)>();
             foreach(var resource in resourceList)
             {
