@@ -14,8 +14,10 @@ namespace DomainLayer.Queries
             dataBase = DbContextFactory.GetStackInternshipDbContext();
         }
 
-        public List<Resource>? GetUserResources(ResourceTag resourceTag)
+        public List<(Resource, string)>? GetUserResources(ResourceTag resourceTag)
         {
+            var helpQuery = new HelperQueries();
+
             var resourceCategory = Enum.GetName(resourceTag);
             DatabaseStateTracker.currentResourceTag = resourceTag;
 
@@ -25,11 +27,20 @@ namespace DomainLayer.Queries
             if(resourceList is null)
                 return null;
 
-            return resourceList;
+            var list = new List<(Resource, string)>();
+            foreach(var resource in resourceList)
+            {
+                var userName = helpQuery.GetAuthorName(resource.ResourceId, null);
+                list.Add((resource, userName));
+            }
+
+            return list;
         }
 
-        public List<Resource>? GetNoReplyResources(ResourceTag resourceTag)
+        public List<(Resource, string)>? GetNoReplyResources(ResourceTag resourceTag)
         {
+            var helpQuery = new HelperQueries();
+
             var resourceCategory = Enum.GetName(resourceTag);
             DatabaseStateTracker.currentResourceTag = resourceTag;
 
@@ -40,18 +51,34 @@ namespace DomainLayer.Queries
             if (resourceList is null)
                 return null;
 
-            return resourceList;
+            var list = new List<(Resource, string)>();
+            foreach (var resource in resourceList)
+            {
+                var userName = helpQuery.GetAuthorName(resource.ResourceId, null);
+                list.Add((resource, userName));
+            }
+
+            return list;
         }
 
-        public List<Resource>? GetPopularResources()
+        public List<(Resource, string)>? GetPopularResources()
         {
+            var helpQuery = new HelperQueries();
+
             var resourceList = dataBase.Resources.Where(t=>t.TimeOfPosting.Date == DateTime.Today)
                 .OrderBy(n => n.NumberOfReplys).Take(5).ToList();
 
             if( resourceList is null || resourceList.Count is 0)
                 return null;
 
-            return resourceList;
+            var list = new List<(Resource, string)>();
+            foreach (var resource in resourceList)
+            {
+                var userName = helpQuery.GetAuthorName(resource.ResourceId, null);
+                list.Add((resource, userName));
+            }
+
+            return list;
         }
 
         public void CreateResource(string content)
@@ -72,7 +99,7 @@ namespace DomainLayer.Queries
             if (helpQuery.IsVoted(resourceId) ||
                 DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteResource)
             {
-                Console.WriteLine("vec ste dislajkali");
+                Console.WriteLine("Vec ste dislajkali ili nemate dovoljno bodova");
                 return;
             }
 
@@ -119,7 +146,8 @@ namespace DomainLayer.Queries
             var commentQuery = new CommentQueries();
 
             if (helpQuery.IsCommented(resourceId) || 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment)
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment ||
+                content.Count() is 0)
             {
                 Console.WriteLine("Vec ste komentirali ili nemate dovoljno bodova");
                 return false;
@@ -128,8 +156,6 @@ namespace DomainLayer.Queries
             commentQuery.AddComment(resourceId, null, content);
 
             dataBase.UserResources.Find(DatabaseStateTracker.CurrentUser.UserId, resourceId).IsCommented = true;
-            dataBase.Resources.Find(resourceId).NumberOfReplys++;
-
             dataBase.SaveChanges();
 
             return true;
@@ -137,19 +163,18 @@ namespace DomainLayer.Queries
 
         public void DeleteResource(int resourceId)
         {
-            var resource = dataBase.Resources.Find(resourceId);
-            var resourceUser = dataBase.UserResources
-                .Where(ur => ur.UserId == resource.ResourceOwnerId && ur.ResourceId == resourceId).FirstOrDefault();
-            if (resource is null || resourceUser is null) return;
-
             var commentQuery = new CommentQueries();
+            var comments = dataBase.Comments.Where(c=>c.ResourceId == resourceId).ToList();
 
-            var comments = dataBase.Comments
-                .Where(c => c.ParentCommentId == null && c.ResourceId == resourceId).ToList();
+            foreach(var comment in comments)
+            {
+                var userComment=dataBase.UserComments.Find(comment.CommentOwnerId, comment.CommentId);
+                dataBase.UserComments.Remove(userComment);
+            }
+            dataBase.RemoveRange(comments);
 
-            if (comments.Count > 0)
-                foreach (var comment in comments)
-                    commentQuery.DeleteComment(comment.CommentId);
+            var resource = dataBase.Resources.Find(resourceId);
+            var resourceUser = dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId);
 
             dataBase.UserResources.Remove(resourceUser);
             dataBase.Resources.Remove(resource);

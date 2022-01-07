@@ -5,9 +5,13 @@ using DataLayer.Entities.Models;
 
 namespace PresentationLayer.Entities
 {
-    public static class DashboardHandler
+    public class DashboardHandler
     {
-        public static bool PrintEntitiesByTag(ResourceTag resourceCategory)
+        private ResourceQueries resourceQuery = new();
+        private CommentQueries commentQuery = new();
+        private UserQueries userQuery = new();
+
+        public bool PrintEntitiesByTag(ResourceTag resourceCategory)
         {
             var resourceInteract = new ResourceInteract();
 
@@ -17,10 +21,9 @@ namespace PresentationLayer.Entities
 
             Printer.PrintResourceTagTitle(resourceCategory);
 
-            var resourceQuery = new ResourceQueries();
             var resourceList = resourceQuery.GetUserResources(resourceCategory);
 
-            PrintResources(resourceList, resourceQuery);
+            PrintResources(resourceList);
 
             if (resourceInteract.StartInteraction())
                 return false;
@@ -28,10 +31,9 @@ namespace PresentationLayer.Entities
             return true;
         }
 
-        private static void PrintComments(int resourceId, int? parentCommentId, string indent)
+        private void PrintComments(int resourceId, int? parentCommentId, string indent)
         {
-            var commentQurey = new CommentQueries();
-            var resourceCommentList = commentQurey.GetResourceComments(resourceId, parentCommentId);
+            var resourceCommentList = commentQuery.GetResourceComments(resourceId, parentCommentId);
 
             if (resourceCommentList.Count is not 0)
             {
@@ -42,38 +44,34 @@ namespace PresentationLayer.Entities
 
                     PrintComments(resourceId, comment.CommentId, indent + "\t");
 
-                    commentQurey.AddUserComment(comment.CommentId);
+                    commentQuery.AddUserComment(comment.CommentId);
                 }
             }
         }
 
-        private static void PrintResources(List<Resource>? resourceList, ResourceQueries resourceQuery)
+        private void PrintResources(List<(Resource, string)>? resourceList)
         {
             if(resourceList is null || resourceList.Count == 0) return;
 
             foreach (var resource in resourceList)
             {
-                Console.WriteLine($"ID:{resource.ResourceId} Tag: {resource.NameTag}\nSadrzaj:{resource.ResourceContent}\n" +
-                    $" Likes: {resource.NumberOfLikes} Dislikes: {resource.NumberOfDislikes}\n");
+                Printer.PrintResource(resource.Item1, resource.Item2);
 
-                resourceQuery.AddUserResource(resource.ResourceId);
+                resourceQuery.AddUserResource(resource.Item1.ResourceId);
 
                 Console.WriteLine("Comments:\n");
-                PrintComments(resource.ResourceId, null, "\t");
+                PrintComments(resource.Item1.ResourceId, null, "\t");
             }
         }
 
-        public static bool GetNoReplyEntities(ResourceTag resourceCategory)
+        public bool GetNoReplyEntities(ResourceTag resourceCategory)
         {
             var resourceInteract = new ResourceInteract();
 
             Printer.PrintEntityTagList();
-
             if (resourceCategory == ResourceTag.None) return false;
 
             Printer.PrintResourceTagTitle(resourceCategory);
-
-            var resourceQuery = new ResourceQueries();
 
             var resourceList = resourceQuery.GetNoReplyResources(resourceCategory);
 
@@ -83,7 +81,7 @@ namespace PresentationLayer.Entities
                 return false;
             }
 
-            PrintResources(resourceList, resourceQuery);
+            PrintResources(resourceList);
 
             if(resourceInteract.StartInteraction())
                 return false;
@@ -91,9 +89,8 @@ namespace PresentationLayer.Entities
             return true;
         }
 
-        public static bool GetAllUsers()
+        public bool GetAllUsers()
         {
-            var userQuery = new UserQueries();
             var usersList = userQuery.ReadAllUsers();
 
             foreach (var user in usersList)
@@ -106,7 +103,7 @@ namespace PresentationLayer.Entities
             return false;
         }
 
-        public static bool ResourceTagSelect()
+        public bool ResourceTagSelect()
         {
             Printer.PrintEntityTagList();
 
@@ -123,7 +120,7 @@ namespace PresentationLayer.Entities
             return true;
         }
 
-        public static bool GetUserInfo()
+        public bool GetUserInfo()
         {
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
             Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role} {currentUserInfo.RepPoints}");
@@ -134,10 +131,9 @@ namespace PresentationLayer.Entities
             return false;
         }
 
-        public static bool GetPopularEntities()
+        public bool GetPopularEntities()
         {
             var resourceInteract = new ResourceInteract();
-            var resourceQuery = new ResourceQueries();
             var resourceList = resourceQuery.GetPopularResources();
 
             if(resourceList is null)
@@ -146,15 +142,12 @@ namespace PresentationLayer.Entities
                 return false;
             }
 
-            foreach(var resource in resourceList)
-                Console.WriteLine($"{resource.ResourceContent} {resource.ResourceOwner}");
+            PrintResources(resourceList);
 
             if (resourceInteract.StartInteraction())
                 return false;
 
             return true;
         }
-
-        
     }
 }

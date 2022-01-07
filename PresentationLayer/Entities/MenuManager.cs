@@ -39,6 +39,7 @@ namespace PresentationLayer.Entities
         public static bool DashboardSwitcher()
         {
             bool isValidInput;
+            var dashboardHandler = new DashboardHandler();
 
             Printer.PrintDashboard();
 
@@ -49,21 +50,21 @@ namespace PresentationLayer.Entities
                 switch (result)
                 {
                     case (int)Enums.DashboardOptions.Resources:
-                        TaskManager.Test(DashboardHandler.ResourceTagSelect);
-                        TaskManager.Test2(DashboardHandler.PrintEntitiesByTag, DatabaseStateTracker.currentResourceTag);
+                        TaskManager.Test(dashboardHandler.ResourceTagSelect);
+                        TaskManager.Test2(dashboardHandler.PrintEntitiesByTag, DatabaseStateTracker.currentResourceTag);
                         break;
                     case (int)Enums.DashboardOptions.Users:
-                        TaskManager.Test(DashboardHandler.GetAllUsers);
+                        TaskManager.Test(dashboardHandler.GetAllUsers);
                         break;
                     case (int)Enums.DashboardOptions.NoReplys:
-                        TaskManager.Test(DashboardHandler.ResourceTagSelect);
-                        TaskManager.Test2(DashboardHandler.GetNoReplyEntities, DatabaseStateTracker.currentResourceTag);
+                        TaskManager.Test(dashboardHandler.ResourceTagSelect);
+                        TaskManager.Test2(dashboardHandler.GetNoReplyEntities, DatabaseStateTracker.currentResourceTag);
                         break;
                     case (int)Enums.DashboardOptions.Popular:
-                        TaskManager.Test(DashboardHandler.GetPopularEntities);
+                        TaskManager.Test(dashboardHandler.GetPopularEntities);
                         break;
                     case (int)Enums.DashboardOptions.MyProfile:
-                        TaskManager.Test(DashboardHandler.GetUserInfo);
+                        TaskManager.Test(dashboardHandler.GetUserInfo);
                         break;
                     case (int)Enums.DashboardOptions.Logout:
                         Printer.ConfirmMessageAndClear("Odjavljeni ste iz sustava");

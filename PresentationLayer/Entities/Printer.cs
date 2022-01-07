@@ -1,9 +1,16 @@
-﻿using DomainLayer.DatabaseEnums;
+﻿using DataLayer.Entities.Models;
+using DomainLayer.DatabaseEnums;
 
 namespace PresentationLayer.Entities
 {
     public static class Printer
     {
+        public static void PrintResource(Resource resource, string userName)
+        {
+            Console.WriteLine($"ID:{resource.ResourceId} Tag: {resource.NameTag} Autor:{userName}\n" +
+                $"Sadrzaj:{resource.ResourceContent}\n" +
+                    $"Broj odgovora: {resource.NumberOfReplys} Likes: {resource.NumberOfLikes} Dislikes: {resource.NumberOfDislikes}\n");
+        }
         public static void PrintResourceTagTitle(ResourceTag resourceTag)
         {
             Console.Clear();

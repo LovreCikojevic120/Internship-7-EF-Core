@@ -61,7 +61,9 @@ namespace DomainLayer.Queries
         {
             var helpQuery = new HelperQueries();
 
-            if (helpQuery.IsCommented(commentId) || DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply)
+            if (helpQuery.IsCommented(commentId) || 
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply || 
+                content.Count() is 0)
             {
                 return false;
             }
@@ -81,27 +83,26 @@ namespace DomainLayer.Queries
 
         public void AddComment(int resourceId, int? parentCommentId, string commentContent)
         {
-            Comment comment = new Comment(DatabaseStateTracker.GenerateEntityId(), commentContent, 0, 0, DatabaseStateTracker.CurrentUser.UserId, resourceId, parentCommentId);
+            var comment = new Comment(DatabaseStateTracker.GenerateEntityId(), commentContent, 0, 0, DatabaseStateTracker.CurrentUser.UserId, resourceId, parentCommentId);
             dataBase.Add(comment);
+            dataBase.Resources.Find(resourceId).NumberOfReplys++;
             dataBase.SaveChanges();
         }
 
         public bool DeleteComment(int commentId)
         {
-            var commentToDelete = dataBase.Comments.Find(commentId);
-            var userComm = dataBase.UserComments.Find(commentToDelete.CommentOwnerId, commentToDelete.CommentId);
-
-            if (commentToDelete is null || userComm is null) return false;
-
-            dataBase.UserComments.Remove(userComm);
-            dataBase.SaveChanges();
-
             var subComments = GetSubComments(commentId);
 
             if (subComments.Count() > 0)
                 foreach (var subComment in subComments)
                     DeleteComment(subComment.CommentId);
 
+            var commentToDelete = dataBase.Comments.Find(commentId);
+            var userComm = dataBase.UserComments.Find(commentToDelete.CommentOwnerId, commentToDelete.CommentId);
+
+            if (commentToDelete is null || userComm is null) return false;
+
+            dataBase.UserComments.Remove(userComm);
             dataBase.Comments.Remove(commentToDelete);
             dataBase.SaveChanges();
 

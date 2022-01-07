@@ -16,6 +16,24 @@ namespace DomainLayer.Queries
             return dataBase.Comments.Where(c => c.CommentId == commentId).Single().ResourceId;
         }
 
+        public string? GetAuthorName(int? resourceId, int? commentId)
+        {
+            if (commentId is null)
+                return dataBase.UserResources.Join(dataBase.Users, ur => ur.UserId, u => u.UserId, (ur, u) => new
+                {
+                    ur.ResourceId,
+                    u.UserName
+
+                }).Where(r => r.ResourceId == resourceId).Select(un=>un.UserName).FirstOrDefault();
+
+            return dataBase.UserComments.Join(dataBase.Users, c => c.UserId, uc => uc.UserId, (c, uc) => new
+            {
+                c.CommentId,
+                uc.UserName
+
+            }).Where(c => c.CommentId == commentId).Select(un => un.UserName).FirstOrDefault();
+        }
+
         public bool IsResource(int entityId)
         {
            return dataBase.Resources.Where(t => t.NameTag == Enum.GetName(DatabaseStateTracker.currentResourceTag)).Any(r => r.ResourceId == entityId);

@@ -146,10 +146,10 @@ namespace PresentationLayer.Entities
             Console.WriteLine("Upisite ID resursa:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            Console.WriteLine("Upisite sadrzaj odgovora:");
+            Console.WriteLine("Upisite sadrzaj odgovora[MIN 5 znakova]:");
             var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
 
-            if (validId && helpQuery.IsResource(entityId))
+            if (validId && validInput && helpQuery.IsResource(entityId))
             {
                 resourceQuery.CommentResource(entityId, content);
                 Printer.ConfirmMessageAndClear($"Komentar dodan na resurs {entityId}");
@@ -164,10 +164,10 @@ namespace PresentationLayer.Entities
         {
 
             Console.WriteLine("Upisite ID komentara:");
-            var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
+            var validId = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int entityId);
 
-            Console.WriteLine("Upisite sadrzaj odgovora:");
-            var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
+            Console.WriteLine("Upisite sadrzaj odgovora [MIN 5 znakova]:");
+            var validInput = Checkers.CheckString(Console.ReadLine().Trim(), out string content);
 
             if (validId && validInput && helpQuery.IsComment(entityId))
             {
