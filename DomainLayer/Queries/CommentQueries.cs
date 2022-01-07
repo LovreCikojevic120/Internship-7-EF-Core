@@ -117,6 +117,10 @@ namespace DomainLayer.Queries
             if (comment is null || dataBase.UserComments.Find(comment.CommentOwnerId, commentId) is null) 
                 return false;
 
+            if (comment.CommentOwnerId == DatabaseStateTracker.CurrentUser.UserId &&
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditOwnEntity)
+                return false;
+
             comment.CommentContent = newContent;
             dataBase.SaveChanges();
 

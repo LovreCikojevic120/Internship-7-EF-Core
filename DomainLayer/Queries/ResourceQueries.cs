@@ -193,6 +193,10 @@ namespace DomainLayer.Queries
             if (resource is null || dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId) is null)
                 return false;
 
+            if (resource.ResourceOwnerId == DatabaseStateTracker.CurrentUser.UserId &&
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditOwnEntity)
+                return false;
+
             resource.ResourceContent = newContent;
             dataBase.SaveChanges();
             return true;
