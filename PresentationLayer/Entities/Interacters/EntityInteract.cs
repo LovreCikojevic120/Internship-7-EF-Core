@@ -55,7 +55,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void DeleteEntity()
         {
-            Console.WriteLine("Upisite ID resursa:");
+            Console.WriteLine("Upisite ID resursa kojeg želite izbrisati:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId, 
@@ -73,9 +73,13 @@ namespace PresentationLayer.Entities.Interacters
 
         private void EditEntity()
         {
-            if (DatabaseStateTracker.CurrentUser.Role == "Intern") return;
+            if (DatabaseStateTracker.CurrentUser.Role == Enum.GetName(UserRole.Intern))
+            {
+                Printer.ConfirmMessageAndClear("Nemate ovlaštenje za ovu akciju", MessageType.Error);
+                return;
+            }
 
-            Console.WriteLine("Upisite ID resursa:");
+            Console.WriteLine("Upisite ID resursa kojeg želite urediti:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
             Console.WriteLine("Upisite novi sadrzaj resursa:");
             var validString = Checkers.CheckString(Console.ReadLine(), out string newContent);
@@ -95,7 +99,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void DislikeEntity()
         {
-            Console.WriteLine("Upisite ID:");
+            Console.WriteLine("Upisite ID koje želite označiti sa 'Ne sviđa mi se':");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId,
@@ -113,7 +117,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void LikeEntity()
         {
-            Console.WriteLine("Upisite ID:");
+            Console.WriteLine("Upisite ID kojeg želite označiti sa 'Sviđa mi se':");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId,
@@ -131,7 +135,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void Comment()
         {
-            Console.WriteLine("Upisite ID resursa:");
+            Console.WriteLine("Upisite ID objave koju želite komentirati:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             Console.WriteLine("Upisite sadrzaj odgovora[MIN 5 znakova]:");
@@ -148,7 +152,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void Reply()
         {
-            Console.WriteLine("Upisite ID komentara:");
+            Console.WriteLine("Upisite ID komentara na koji želite odgovoriti:");
             var validId = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int entityId);
 
             Console.WriteLine("Upisite sadrzaj odgovora [MIN 5 znakova]:");
@@ -164,7 +168,7 @@ namespace PresentationLayer.Entities.Interacters
 
         private void CreateResource()
         {
-            if (DatabaseStateTracker.CurrentUser.Role == "Intern")
+            if (DatabaseStateTracker.CurrentUser.Role == Enum.GetName(UserRole.Intern))
             {
                 Printer.ConfirmMessageAndClear("Nemate ovlaštenje za ovu akciju", MessageType.Error);
                 return;
