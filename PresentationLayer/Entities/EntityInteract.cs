@@ -1,10 +1,11 @@
-﻿using DomainLayer.Entities;
+﻿using DataLayer.Enums;
+using DomainLayer.Entities;
 using DomainLayer.Queries;
 using PresentationLayer.Enums;
 
 namespace PresentationLayer.Entities
 {
-    public class ResourceInteract
+    public class EntityInteract
     {
         private CommentQueries commentQuery = new();
         private ResourceQueries resourceQuery = new();
@@ -42,10 +43,10 @@ namespace PresentationLayer.Entities
                     DeleteEntity();
                     break;
                 case (int)ResourceInteraction.None:
-                    Printer.ConfirmMessageAndClear("Vracate se na dashboard");
+                    Printer.ConfirmMessageAndClear("Vracate se na dashboard", MessageType.Note);
                     return true;
                 default:
-                    Printer.ConfirmMessageAndClear("Unos opcije izbornika neispravan");
+                    Printer.ConfirmMessageAndClear("Unos opcije izbornika neispravan", MessageType.Error);
                     return false;
             }
             return false;
@@ -56,45 +57,39 @@ namespace PresentationLayer.Entities
             Console.WriteLine("Upisite ID resursa:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            if (validId && helpQuery.IsResource(entityId))
-            {
-                resourceQuery.DeleteResource(entityId);
-                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} izbrisan");
+            if (ErrorHandler.PrintError(validId, 
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, 
+                resourceQuery.DeleteResource(entityId)))
                 return;
-            }
 
-            if (validId && helpQuery.IsComment(entityId))
-            {
-                commentQuery.DeleteComment(entityId);
-                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} izbrisan");
+            if (ErrorHandler.PrintError(validId, 
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, 
+                commentQuery.DeleteComment(entityId)))
                 return;
-            }
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
         }
 
         private void EditEntity()
         {
+            if (DatabaseStateTracker.CurrentUser.Role == "Intern") return;
+
             Console.WriteLine("Upisite ID resursa:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
             Console.WriteLine("Upisite novi sadrzaj resursa:");
             var validString = Checkers.CheckString(Console.ReadLine(), out string newContent);
 
-            if (validId && helpQuery.IsResource(entityId) && validString)
-            {
-                resourceQuery.EditResource(entityId, newContent);
-                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} ureden");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity,
+                resourceQuery.EditResource(entityId, newContent)))
                 return;
-            }
 
-            if (validId && helpQuery.IsComment(entityId) && validString)
-            {
-                commentQuery.EditComment(entityId, newContent);
-                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} ureden");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity,
+                commentQuery.EditComment(entityId, newContent)))
                 return;
-            }
 
-            Printer.ConfirmMessageAndClear("Greska");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
         }
 
         private void DislikeEntity()
@@ -102,21 +97,17 @@ namespace PresentationLayer.Entities
             Console.WriteLine("Upisite ID:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            if (validId && helpQuery.IsResource(entityId))
-            {
-                resourceQuery.DislikeResource(entityId);
-                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} oznacen sa 'ne svida mi se'");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteResource,
+                resourceQuery.DislikeResource(entityId)))
                 return;
-            }
 
-            if (validId && helpQuery.IsComment(entityId)) 
-            { 
-                commentQuery.DislikeComment(entityId);
-                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} oznacen sa 'ne svida mi se'");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteComment,
+                commentQuery.DislikeComment(entityId)))
                 return;
-            }
 
-            Printer.ConfirmMessageAndClear("Greska");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
         }
 
         private void LikeEntity()
@@ -124,21 +115,17 @@ namespace PresentationLayer.Entities
             Console.WriteLine("Upisite ID:");
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
-            if (validId && helpQuery.IsResource(entityId))
-            {
-                resourceQuery.LikeResource(entityId);
-                Printer.ConfirmMessageAndClear($"Resurs ID-a {entityId} oznacen sa 'svida mi se'");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote,
+                resourceQuery.LikeResource(entityId)))
                 return;
-            }
 
-            if (validId && helpQuery.IsComment(entityId))
-            {
-                commentQuery.LikeComment(entityId);
-                Printer.ConfirmMessageAndClear($"Komentar ID-a {entityId} oznacen sa 'svida mi se'");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote,
+                commentQuery.LikeComment(entityId)))
                 return;
-            }
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji!");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
         }
 
         private void Comment()
@@ -149,49 +136,50 @@ namespace PresentationLayer.Entities
             Console.WriteLine("Upisite sadrzaj odgovora[MIN 5 znakova]:");
             var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
 
-            if (validId && validInput && helpQuery.IsResource(entityId))
-            {
-                resourceQuery.CommentResource(entityId, content);
-                Printer.ConfirmMessageAndClear($"Komentar dodan na resurs {entityId}");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment,
+                resourceQuery.CommentResource(entityId, content)))
                 return;
-            }
                 
-            Printer.ConfirmMessageAndClear("Greska");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
 
         }
 
         private void Reply()
         {
-
             Console.WriteLine("Upisite ID komentara:");
             var validId = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int entityId);
 
             Console.WriteLine("Upisite sadrzaj odgovora [MIN 5 znakova]:");
             var validInput = Checkers.CheckString(Console.ReadLine().Trim(), out string content);
 
-            if (validId && validInput && helpQuery.IsComment(entityId))
-            {
-                commentQuery.ReplyOnComment(entityId, content);
-                Printer.ConfirmMessageAndClear($"Odgovor dodan na komentar {entityId}");
+            if (ErrorHandler.PrintError(validId,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply,
+                commentQuery.ReplyOnComment(entityId, content)))
                 return;
-            }
 
-            Printer.ConfirmMessageAndClear("Komentar ne postoji");
+            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
         }
 
         private void CreateResource()
         {
+            if (DatabaseStateTracker.CurrentUser.Role == "Intern")
+            {
+                Printer.ConfirmMessageAndClear("Nemate ovlaštenje za ovu akciju", MessageType.Error);
+                return;
+            }
+
             Console.WriteLine("Upisite sadrzaj novog resursa:");
             var validString = Checkers.CheckString(Console.ReadLine(), out string content);
 
             if (validString)
             {
                 resourceQuery.CreateResource(content);
-                Printer.ConfirmMessageAndClear("Resurs uspjesno dodan");
+                Printer.ConfirmMessageAndClear("Resurs uspjesno dodan", MessageType.Success);
                 return;
             }
 
-            Printer.ConfirmMessageAndClear("Greska");
+            Printer.ConfirmMessageAndClear("Sadrzaj krivo upisan", MessageType.Error);
         }
     }
 }

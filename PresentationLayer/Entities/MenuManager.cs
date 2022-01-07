@@ -1,4 +1,5 @@
-﻿using DomainLayer.Entities;
+﻿using DataLayer.Enums;
+using DomainLayer.Entities;
 
 namespace PresentationLayer.Entities
 {
@@ -14,23 +15,23 @@ namespace PresentationLayer.Entities
 
             if (!isValidInput)
             {
-                Printer.ConfirmMessageAndClear("Unos opcije izbornika neispravan");
+                Printer.ConfirmMessageAndClear("Unos opcije izbornika neispravan", MessageType.Error);
                 return true;
             }
 
             switch (result)
             {
-                case (int)Enums.MainMenuOption.Register:
-                    TaskManager.Test(MainMenuHandler.Register);
+                case (int)MainMenuOption.Register:
+                    TaskManager.Tasker(MainMenuHandler.Register);
                     break;
-                case (int)Enums.MainMenuOption.Login:
-                    TaskManager.Test(MainMenuHandler.Login);
+                case (int)MainMenuOption.Login:
+                    TaskManager.Tasker(MainMenuHandler.Login);
                     break;
-                case (int)Enums.MainMenuOption.Exit:
-                    Printer.ConfirmMessageAndClear("Izasli ste iz aplikacije");
+                case (int)MainMenuOption.Exit:
+                    Printer.ConfirmMessageAndClear("Izasli ste iz aplikacije", MessageType.Note);
                     return false;
                 default:
-                    Printer.ConfirmMessageAndClear("Neispravan unos");
+                    Printer.ConfirmMessageAndClear("Neispravan unos", MessageType.Error);
                     return true;
             }
             return true;
@@ -41,6 +42,7 @@ namespace PresentationLayer.Entities
             bool isValidInput;
             var dashboardHandler = new DashboardHandler();
 
+            Printer.PrintTitle("DASHBOARD");
             Printer.PrintDashboard();
 
             isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);
@@ -49,28 +51,28 @@ namespace PresentationLayer.Entities
             {
                 switch (result)
                 {
-                    case (int)Enums.DashboardOptions.Resources:
-                        TaskManager.Test(dashboardHandler.ResourceTagSelect);
-                        TaskManager.Test2(dashboardHandler.PrintEntitiesByTag, DatabaseStateTracker.currentResourceTag);
+                    case (int)DashboardOptions.Resources:
+                        TaskManager.Tasker(dashboardHandler.ResourceTagSelect);
+                        TaskManager.DashboardTasker(dashboardHandler.PrintEntitiesByTag, DatabaseStateTracker.currentResourceTag);
                         break;
-                    case (int)Enums.DashboardOptions.Users:
-                        TaskManager.Test(dashboardHandler.GetAllUsers);
+                    case (int)DashboardOptions.Users:
+                        TaskManager.Tasker(dashboardHandler.GetAllUsers);
                         break;
-                    case (int)Enums.DashboardOptions.NoReplys:
-                        TaskManager.Test(dashboardHandler.ResourceTagSelect);
-                        TaskManager.Test2(dashboardHandler.GetNoReplyEntities, DatabaseStateTracker.currentResourceTag);
+                    case (int)DashboardOptions.NoReplys:
+                        TaskManager.Tasker(dashboardHandler.ResourceTagSelect);
+                        TaskManager.DashboardTasker(dashboardHandler.GetNoReplyEntities, DatabaseStateTracker.currentResourceTag);
                         break;
-                    case (int)Enums.DashboardOptions.Popular:
-                        TaskManager.Test(dashboardHandler.GetPopularEntities);
+                    case (int)DashboardOptions.Popular:
+                        TaskManager.Tasker(dashboardHandler.GetPopularEntities);
                         break;
-                    case (int)Enums.DashboardOptions.MyProfile:
-                        TaskManager.Test(dashboardHandler.GetUserInfo);
+                    case (int)DashboardOptions.MyProfile:
+                        TaskManager.Tasker(dashboardHandler.GetUserInfo);
                         break;
-                    case (int)Enums.DashboardOptions.Logout:
-                        Printer.ConfirmMessageAndClear("Odjavljeni ste iz sustava");
+                    case (int)DashboardOptions.Logout:
+                        Printer.ConfirmMessageAndClear("Odjavljeni ste iz sustava", MessageType.Note);
                         return false;
                     default:
-                        Printer.ConfirmMessageAndClear("Unijeli ste ne postojecu opciju");
+                        Printer.ConfirmMessageAndClear("Unijeli ste ne postojecu opciju", MessageType.Error);
                         return true;
                 }
             }

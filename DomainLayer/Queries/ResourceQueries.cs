@@ -1,6 +1,6 @@
 ﻿using DataLayer.Entities;
 using DataLayer.Entities.Models;
-using DomainLayer.DatabaseEnums;
+using DataLayer.Enums;
 using DomainLayer.Entities;
 
 namespace DomainLayer.Queries
@@ -14,10 +14,12 @@ namespace DomainLayer.Queries
             dataBase = DbContextFactory.GetStackInternshipDbContext();
         }
 
+        HelperQueries helpQuery = new();
+        ReputationQueries reputationQuery = new();
+        CommentQueries commentQuery = new();
+
         public List<(Resource, string)>? GetUserResources(ResourceTag resourceTag)
         {
-            var helpQuery = new HelperQueries();
-
             var resourceCategory = Enum.GetName(resourceTag);
             DatabaseStateTracker.currentResourceTag = resourceTag;
 
@@ -39,8 +41,6 @@ namespace DomainLayer.Queries
 
         public List<(Resource, string)>? GetNoReplyResources(ResourceTag resourceTag)
         {
-            var helpQuery = new HelperQueries();
-
             var resourceCategory = Enum.GetName(resourceTag);
             DatabaseStateTracker.currentResourceTag = resourceTag;
 
@@ -63,8 +63,6 @@ namespace DomainLayer.Queries
 
         public List<(Resource, string)>? GetPopularResources()
         {
-            var helpQuery = new HelperQueries();
-
             var resourceList = dataBase.Resources.Where(t=>t.TimeOfPosting.Date == DateTime.Today)
                 .OrderBy(n => n.NumberOfReplys).Take(5).ToList();
 
@@ -91,20 +89,15 @@ namespace DomainLayer.Queries
             AddUserResource(newResource.ResourceId);
         }
 
-        public void DislikeResource(int resourceId)
+        public bool DislikeResource(int resourceId)
         {
-            var helpQuery = new HelperQueries();
-            var reputationQuery = new ReputationQueries();
-
-            if (helpQuery.IsVoted(resourceId) ||
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteResource)
-            {
-                Console.WriteLine("Vec ste dislajkali ili nemate dovoljno bodova");
-                return;
-            }
+            if (helpQuery.IsVoted(resourceId) || helpQuery.IsResource(resourceId) is false)
+                return false;
 
             var userResource = dataBase.UserResources
                 .Single(ur => ur.ResourceId == resourceId && ur.UserId == DatabaseStateTracker.CurrentUser.UserId);
+            if (userResource is null) return false;
+
             userResource.IsVoted = true;
 
             var resource = dataBase.Resources.Single(r => r.ResourceId == resourceId);
@@ -113,22 +106,19 @@ namespace DomainLayer.Queries
 
             reputationQuery.GiveDownvoteResource(resource.ResourceOwnerId);
             reputationQuery.GetDownvotePoints();
+
+            return true;
         }
 
-        public void LikeResource(int resourceId)
+        public bool LikeResource(int resourceId)
         {
-            var helpQuery = new HelperQueries();
-            var reputationQuery = new ReputationQueries();
-
-            if (helpQuery.IsVoted(resourceId) ||
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote)
-            {
-                Console.WriteLine("vec ste lajkali");
-                return;
-            }
+            if (helpQuery.IsVoted(resourceId) || helpQuery.IsResource(resourceId) is false)
+                return false;
 
             var userResource = dataBase.UserResources
                 .Single(ur => ur.ResourceId == resourceId && ur.UserId == DatabaseStateTracker.CurrentUser.UserId);
+            if (userResource is null) return false;
+
             userResource.IsVoted = true;
 
             var resource = dataBase.Resources.Single(r => r.ResourceId == resourceId);
@@ -138,20 +128,14 @@ namespace DomainLayer.Queries
             reputationQuery.GetUpvoteComment();
 
             dataBase.SaveChanges();
+
+            return true;
         }
 
         public bool CommentResource(int resourceId, string content)
         {
-            var helpQuery = new HelperQueries();
-            var commentQuery = new CommentQueries();
-
-            if (helpQuery.IsCommented(resourceId) || 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment ||
-                content.Count() is 0)
-            {
-                Console.WriteLine("Vec ste komentirali ili nemate dovoljno bodova");
+            if (helpQuery.IsCommented(resourceId) || helpQuery.IsResource(resourceId) is false || content.Count() is 0)
                 return false;
-            }
 
             commentQuery.AddComment(resourceId, null, content);
 
@@ -161,10 +145,12 @@ namespace DomainLayer.Queries
             return true;
         }
 
-        public void DeleteResource(int resourceId)
+        public bool DeleteResource(int resourceId)
         {
-            var commentQuery = new CommentQueries();
+            if (helpQuery.IsResource(resourceId) is false) return false;
+
             var comments = dataBase.Comments.Where(c=>c.ResourceId == resourceId).ToList();
+            if (comments.Count() is 0) return false;
 
             foreach(var comment in comments)
             {
@@ -174,11 +160,14 @@ namespace DomainLayer.Queries
             dataBase.RemoveRange(comments);
 
             var resource = dataBase.Resources.Find(resourceId);
+            if (resource is null) return false;
             var resourceUser = dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId);
 
             dataBase.UserResources.Remove(resourceUser);
             dataBase.Resources.Remove(resource);
             dataBase.SaveChanges();
+
+            return true;
         }
 
         public void AddUserResource(int resourceId)
@@ -191,14 +180,17 @@ namespace DomainLayer.Queries
             dataBase.SaveChanges();
         }
 
-        public void EditResource(int resourceId, string newContent)
+        public bool EditResource(int resourceId, string newContent)
         {
+            if (helpQuery.IsResource(resourceId) is false) return false;
+
             var resource = dataBase.Resources.Find(resourceId);
             if (resource is null || dataBase.UserResources.Find(resource.ResourceOwnerId, resource.ResourceId) is null)
-                return;
+                return false;
 
             resource.ResourceContent = newContent;
             dataBase.SaveChanges();
+            return true;
         }
 
     }

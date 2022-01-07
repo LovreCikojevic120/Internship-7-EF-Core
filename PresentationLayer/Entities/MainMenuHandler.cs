@@ -1,4 +1,4 @@
-﻿using DomainLayer.Entities;
+﻿using DataLayer.Enums;
 using DomainLayer.Queries;
 
 namespace PresentationLayer.Entities
@@ -7,32 +7,31 @@ namespace PresentationLayer.Entities
     {
         public static bool Register()
         {
-            string username, password;
-            bool validName, validPassword;
+            string username = null, password = null;
             var userQuery = new UserQueries();
 
-            Printer.PrintTitle("Registracija");
-
+            Printer.PrintTitle("REGISTRACIJA");
+            
             Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
-            validName = Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
+            Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
             if (possibleName.Count() is 0) return false;
             username = possibleName;
 
             Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
-            validPassword = Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
+            Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
             if (possiblePass.Count() is 0) return false;
             password = possiblePass;
 
-            if (userQuery.UserExists(username) || !validName || !validPassword)
+            if (userQuery.UserExists(username))
             {
-                Printer.ConfirmMessageAndClear("Vec postoji");
+                Printer.ConfirmMessageAndClear("Korisnik sa tim imenom vec postoji", MessageType.Error);
                 return true;
             }
             
             userQuery.Register(username, password);
-            Printer.ConfirmMessageAndClear("Uspjesno ste registrirani");
+            Printer.ConfirmMessageAndClear($"Uspjesno ste registrirani kao {username}", MessageType.Success);
 
-            TaskManager.Test(MenuManager.DashboardSwitcher);
+            TaskManager.Tasker(MenuManager.DashboardSwitcher);
             return false;
         }
 
@@ -42,26 +41,28 @@ namespace PresentationLayer.Entities
             bool loginSuccess;
             UserQueries queries = new UserQueries();
 
-            Printer.PrintTitle("Login");
+            Printer.PrintTitle("LOGIN");
 
             Console.WriteLine("Upisi korisnicko ime (MIN 5 karaktera):");
-            username = Console.ReadLine().Trim();
-            if (username.Count() is 0) return false;
+            Checkers.CheckString(Console.ReadLine().Trim(), out string possibleName);
+            if (possibleName.Count() is 0) return false;
+            username = possibleName;
 
             Console.WriteLine("Upisite svoju lozinku (MIN 5 karaktera):");
-            password = Console.ReadLine().Trim();
-            if (password.Count() is 0) return false;
+            Checkers.CheckString(Console.ReadLine().Trim(), out string possiblePass);
+            if (possiblePass.Count() is 0) return false;
+            password = possiblePass;
 
             loginSuccess = queries.Login(username, password);
 
             if (loginSuccess is true)
             {
-                Printer.ConfirmMessageAndClear($"Uspjesno ste prijavljeni kao: {DatabaseStateTracker.CurrentUser.UserName}");
-                TaskManager.Test(MenuManager.DashboardSwitcher);
+                Printer.ConfirmMessageAndClear($"Uspjesno ste prijavljeni kao {username}", MessageType.Success);
+                TaskManager.Tasker(MenuManager.DashboardSwitcher);
                 return false;
             }
 
-            Printer.ConfirmMessageAndClear($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu ili je deaktiviran");
+            Printer.ConfirmMessageAndClear($"Korisnik s imenom {username} i lozinkom {password} ne postoji u sustavu ili je deaktiviran", MessageType.Error);
             return true;
         }
     }

@@ -1,5 +1,5 @@
 ﻿using DomainLayer.Queries;
-using DomainLayer.DatabaseEnums;
+using DataLayer.Enums;
 using DomainLayer.Entities;
 using DataLayer.Entities.Models;
 
@@ -13,7 +13,7 @@ namespace PresentationLayer.Entities
 
         public bool PrintEntitiesByTag(ResourceTag resourceCategory)
         {
-            var resourceInteract = new ResourceInteract();
+            var resourceInteract = new EntityInteract();
 
             Printer.PrintEntityTagList();
 
@@ -51,7 +51,11 @@ namespace PresentationLayer.Entities
 
         private void PrintResources(List<(Resource, string)>? resourceList)
         {
-            if(resourceList is null || resourceList.Count == 0) return;
+            if (resourceList is null || resourceList.Count == 0)
+            {
+                Console.WriteLine("Lista resursa prazna!");
+                return;
+            }
 
             foreach (var resource in resourceList)
             {
@@ -66,7 +70,7 @@ namespace PresentationLayer.Entities
 
         public bool GetNoReplyEntities(ResourceTag resourceCategory)
         {
-            var resourceInteract = new ResourceInteract();
+            var resourceInteract = new EntityInteract();
 
             Printer.PrintEntityTagList();
             if (resourceCategory == ResourceTag.None) return false;
@@ -74,12 +78,6 @@ namespace PresentationLayer.Entities
             Printer.PrintResourceTagTitle(resourceCategory);
 
             var resourceList = resourceQuery.GetNoReplyResources(resourceCategory);
-
-            if (resourceList is null || resourceList.Count is 0)
-            {
-                Printer.ConfirmMessageAndClear("Lista resursa prazna");
-                return false;
-            }
 
             PrintResources(resourceList);
 
@@ -94,12 +92,15 @@ namespace PresentationLayer.Entities
             var usersList = userQuery.ReadAllUsers();
 
             foreach (var user in usersList)
-                Console.WriteLine($"{user.UserName} {user.Role} {user.RepPoints}");
+                Printer.PrintUsers(user);
 
             if(DatabaseStateTracker.CurrentUser.Role == "Admin")
-                UserInteract.StartInteract();
+            {
+                if (UserInteract.StartInteract())
+                    return true;
+            }  
 
-            Printer.ConfirmMessageAndClear("Gotovo");
+            Printer.ConfirmMessageAndClear("Korisnici ispisani", MessageType.Success);
             return false;
         }
 
@@ -115,7 +116,7 @@ namespace PresentationLayer.Entities
                 return false;
             }
 
-            Console.WriteLine("Krivi unos");
+            Printer.ConfirmMessageAndClear("Krivi unos izbornika", MessageType.Error);
             DatabaseStateTracker.currentResourceTag = ResourceTag.None;
             return true;
         }
@@ -123,24 +124,19 @@ namespace PresentationLayer.Entities
         public bool GetUserInfo()
         {
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
-            Console.WriteLine($"{currentUserInfo.UserName} {currentUserInfo.Password} {currentUserInfo.Role} {currentUserInfo.RepPoints}");
+            Printer.PrintUserPersonal(currentUserInfo);
 
             Printer.PrintUserSettingsMenu();
-            UserInteract.StartSettings();
+            if(UserInteract.StartSettings())
+                return false;
 
-            return false;
+            return true;
         }
 
         public bool GetPopularEntities()
         {
-            var resourceInteract = new ResourceInteract();
+            var resourceInteract = new EntityInteract();
             var resourceList = resourceQuery.GetPopularResources();
-
-            if(resourceList is null)
-            {
-                Printer.ConfirmMessageAndClear("Lista resursa prazna");
-                return false;
-            }
 
             PrintResources(resourceList);
 

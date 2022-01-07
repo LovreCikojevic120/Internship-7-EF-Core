@@ -13,7 +13,11 @@ namespace DomainLayer.Queries
 
         public int? GetResourceId(int commentId)
         {
-            return dataBase.Comments.Where(c => c.CommentId == commentId).Single().ResourceId;
+            var comment = dataBase.Comments.Find(commentId);
+
+            if (comment == null)return null;
+
+            return comment.ResourceId;
         }
 
         public string? GetAuthorName(int? resourceId, int? commentId)

@@ -4,7 +4,7 @@
     {
         static void Main()
         {
-            TaskManager.Test(MenuManager.MainMenuSwitcher);
+            TaskManager.Tasker(MenuManager.MainMenuSwitcher);
         }
     }
 }

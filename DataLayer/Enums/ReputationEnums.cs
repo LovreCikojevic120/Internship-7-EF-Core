@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.DatabaseEnums
+﻿namespace DataLayer.Enums
 {
     public enum ReputationPoints
     {
@@ -9,7 +9,7 @@
         CanDownvoteResource = 20,
         CanEditOwnEntity = 100,
         CanEditAnyEntity = 250,
-        CanDeleteComment = 500,
+        CanDelete = 500,
         IsTrusted = 1000,
         IsOrganizer = 100000
     }

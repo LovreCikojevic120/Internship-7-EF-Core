@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.DatabaseEnums
+﻿namespace DataLayer.Enums
 {
     public enum ResourceTag
     {

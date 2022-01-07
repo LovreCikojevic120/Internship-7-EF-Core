@@ -1,61 +1,56 @@
-﻿using DomainLayer.Queries;
+﻿using DataLayer.Enums;
+using DomainLayer.Queries;
 
 namespace PresentationLayer.Entities
 {
     public static class UserInteract
     {
-        public static void StartInteract()
+        public static bool StartInteract()
         {
-            var validInput = false;
+            Printer.PrintUserInteractMenu();
 
-            do
+            Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
+
+            switch (menuOption)
             {
-                Printer.PrintUserInteractMenu();
-
-                validInput = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
-
-                switch (menuOption)
-                {
-                    case 1:
-                        TemporaryDeactivate();
-                        break;
-                    case 2:
-                        PermaDeactivate();
-                        break;
-                    case 3:
-                        Reactivate();
-                        break;
-                    default:
-                        Printer.ConfirmMessageAndClear("Krivi unos!");
-                        break;
-                }
+                case 1:
+                    TemporaryDeactivate();
+                    break;
+                case 2:
+                    PermaDeactivate();
+                    break;
+                case 3:
+                    Reactivate();
+                    break;
+                case 4:
+                    return true;
+                default:
+                    Printer.ConfirmMessageAndClear("Krivi unos!", MessageType.Error);
+                    return false;
             }
-            while (!validInput);
+            return false;
         }
 
-        public static void StartSettings()
+        public static bool StartSettings()
         {
-            var validInput = false;
+            Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
 
-            do
-            { 
-
-                validInput = Checkers.CheckForNumber(Console.ReadLine().Trim(), out int menuOption);
-
-                switch (menuOption)
-                {
-                    case 1:
-                        EditUserName();
-                        break;
-                    case 2:
-                        EditPassword();
-                        break;
-                    default:
-                        Printer.ConfirmMessageAndClear("Krivi unos!");
-                        break;
-                }
+            switch (menuOption)
+            {
+                case 1:
+                    EditUserName();
+                    break;
+                case 2:
+                    EditPassword();
+                    break;
+                case 3:
+                    Printer.ConfirmMessageAndClear("Vracate se na dashboard", MessageType.Note);
+                    return true;
+                default:
+                    Printer.ConfirmMessageAndClear("Krivi unos!", MessageType.Error);
+                    return false;
             }
-            while (!validInput);
+            return false;
         }
 
         private static void EditPassword()

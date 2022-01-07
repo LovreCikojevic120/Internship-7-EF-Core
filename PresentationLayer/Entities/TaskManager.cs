@@ -1,9 +1,4 @@
-﻿using DomainLayer.DatabaseEnums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataLayer.Enums;
 
 namespace PresentationLayer.Entities
 {
@@ -13,7 +8,9 @@ namespace PresentationLayer.Entities
 
         public delegate bool DashboardTask(ResourceTag tag);
 
-        public static void Test(RunningTask runningTask)
+        public delegate bool InteractTasker();
+
+        public static void Tasker(RunningTask runningTask)
         {
             bool isRunning;
 
@@ -26,7 +23,7 @@ namespace PresentationLayer.Entities
             while (isRunning);
         }
 
-        public static void Test2(DashboardTask runningTask, ResourceTag tag)
+        public static void DashboardTasker(DashboardTask runningTask, ResourceTag tag)
         {
             bool isRunning;
 
@@ -37,6 +34,11 @@ namespace PresentationLayer.Entities
                 if (isRunning is false) return;
             }
             while (isRunning);
+        }
+
+        public static void EntityInteracTask(InteractTasker interact)
+        {
+            
         }
     }
 }

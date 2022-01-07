@@ -1,4 +1,4 @@
-﻿namespace PresentationLayer.Enums
+﻿namespace DataLayer.Enums
 {
     public enum DashboardOptions
     {

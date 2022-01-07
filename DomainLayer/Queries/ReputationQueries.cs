@@ -1,6 +1,6 @@
 ﻿using DataLayer.Entities;
 using DataLayer.Entities.Models;
-using DomainLayer.DatabaseEnums;
+using DataLayer.Enums;
 using DomainLayer.Entities;
 
 namespace DomainLayer.Queries

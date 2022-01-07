@@ -1,5 +1,5 @@
 ﻿using DataLayer.Entities.Models;
-using DomainLayer.DatabaseEnums;
+using DataLayer.Enums;
 
 namespace DomainLayer.Entities
 {

@@ -1,6 +1,6 @@
 ﻿using DataLayer.Entities;
 using DataLayer.Entities.Models;
-using DomainLayer.DatabaseEnums;
+using DataLayer.Enums;
 using DomainLayer.Entities;
 
 namespace DomainLayer.Queries
@@ -14,16 +14,13 @@ namespace DomainLayer.Queries
             dataBase = DbContextFactory.GetStackInternshipDbContext();
         }
 
+        HelperQueries helpQuery = new();
+        ReputationQueries reputationQuery = new();
+
         public bool LikeComment(int commentId)
         {
-            var reputationQuery = new ReputationQueries();
-            var helpQuery = new HelperQueries();
-            
-            if (helpQuery.IsVoted(commentId) || 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote)
-            {
+            if (helpQuery.IsVoted(commentId) || helpQuery.IsComment(commentId) is false)
                 return false;
-            }
 
             var comment = dataBase.Comments.Single(r => r.CommentId == commentId);
             comment.NumberOfLikes++;
@@ -37,15 +34,8 @@ namespace DomainLayer.Queries
 
         public bool DislikeComment(int commentId)
         {
-            var helpQuery = new HelperQueries();
-            var reputationQuery = new ReputationQueries();
-
-            if (helpQuery.IsVoted(commentId) ||
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteComment)
-            {
-                Console.WriteLine("vec ste lajkali");
+            if (helpQuery.IsVoted(commentId) || helpQuery.IsComment(commentId) is false)
                 return false;
-            }
 
             var comment = dataBase.Comments.Find(commentId);
             comment.NumberOfDislikes++;
@@ -59,14 +49,8 @@ namespace DomainLayer.Queries
 
         public bool ReplyOnComment(int commentId, string content)
         {
-            var helpQuery = new HelperQueries();
-
-            if (helpQuery.IsCommented(commentId) || 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply || 
-                content.Count() is 0)
-            {
+            if (helpQuery.IsCommented(commentId) || helpQuery.IsComment(commentId) || content.Count() is 0)
                 return false;
-            }
 
             var resourceId = helpQuery.GetResourceId(commentId);
 
@@ -91,6 +75,8 @@ namespace DomainLayer.Queries
 
         public bool DeleteComment(int commentId)
         {
+            if(helpQuery.IsComment(commentId) is false)return false;
+
             var subComments = GetSubComments(commentId);
 
             if (subComments.Count() > 0)
@@ -98,11 +84,13 @@ namespace DomainLayer.Queries
                     DeleteComment(subComment.CommentId);
 
             var commentToDelete = dataBase.Comments.Find(commentId);
-            var userComm = dataBase.UserComments.Find(commentToDelete.CommentOwnerId, commentToDelete.CommentId);
+            var userComment = dataBase.UserComments.Find(commentToDelete.CommentOwnerId, commentToDelete.CommentId);
 
-            if (commentToDelete is null || userComm is null) return false;
+            if (commentToDelete is null || userComment is null) return false;
 
-            dataBase.UserComments.Remove(userComm);
+            dataBase.Resources.Find(helpQuery.GetResourceId(commentId)).NumberOfReplys--;
+
+            dataBase.UserComments.Remove(userComment);
             dataBase.Comments.Remove(commentToDelete);
             dataBase.SaveChanges();
 
@@ -121,6 +109,8 @@ namespace DomainLayer.Queries
 
         public bool EditComment(int commentId, string newContent)
         {
+            if (helpQuery.IsComment(commentId) is false) return false;
+
             var comment = dataBase.Comments.Find(commentId);
             if (comment is null || dataBase.UserComments.Find(comment.CommentOwnerId, commentId) is null) 
                 return false;
