@@ -130,6 +130,7 @@ namespace DomainLayer.Queries
             var list = new List<(Comment, string)>();
             foreach (var comment in commentList)
             {
+                dataBase.Entry(comment).Reload();
                 var userName = helpQuery.GetAuthorName(null, comment.CommentId);
                 list.Add((comment, userName));
             }

@@ -90,7 +90,7 @@ namespace PresentationLayer.Entities.Interacters
                 commentQuery.EditComment(entityId, newContent)))
                 return;
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greška", MessageType.Error);
         }
 
         private void DislikeEntity()
@@ -159,7 +159,7 @@ namespace PresentationLayer.Entities.Interacters
                 commentQuery.ReplyOnComment(entityId, content)))
                 return;
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greška", MessageType.Error);
         }
 
         private void CreateResource()

@@ -29,9 +29,12 @@ namespace DomainLayer.Queries
             if(resourceList is null)
                 return null;
 
+            
+
             var list = new List<(Resource, string)>();
             foreach(var resource in resourceList)
             {
+                dataBase.Entry(resource).Reload();
                 var userName = helpQuery.GetAuthorName(resource.ResourceId, null);
                 list.Add((resource, userName));
             }
