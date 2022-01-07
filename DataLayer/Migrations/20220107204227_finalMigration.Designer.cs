@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(StackInternshipDbContext))]
-    [Migration("20220105165052_test2")]
-    partial class test2
+    [Migration("20220107204227_finalMigration")]
+    partial class finalMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -64,7 +64,7 @@ namespace DataLayer.Migrations
                         {
                             CommentId = 3,
                             CommentContent = "Fritule su bezveze",
-                            CommentOwnerId = 1,
+                            CommentOwnerId = 2,
                             NumberOfDislikes = 4,
                             NumberOfLikes = 4,
                             ResourceId = 1,
@@ -113,10 +113,10 @@ namespace DataLayer.Migrations
                             NameTag = "Dev",
                             NumberOfDislikes = 4,
                             NumberOfLikes = 4,
-                            NumberOfReplys = 7,
+                            NumberOfReplys = 1,
                             ResourceContent = "Fritule su najbolje slatko",
                             ResourceOwnerId = 1,
-                            TimeOfPosting = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            TimeOfPosting = new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -127,7 +127,7 @@ namespace DataLayer.Migrations
                             NumberOfReplys = 0,
                             ResourceContent = "Krokanti su najbolje slatko",
                             ResourceOwnerId = 1,
-                            TimeOfPosting = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            TimeOfPosting = new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -174,9 +174,19 @@ namespace DataLayer.Migrations
                             IsDeactivated = false,
                             IsTrusted = true,
                             Password = "12345",
-                            RepPoints = 1000000,
-                            Role = "Admin",
-                            UserName = "Ivan Bakotin"
+                            RepPoints = 10000,
+                            Role = "Organizator",
+                            UserName = "Jure Juric"
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            IsDeactivated = false,
+                            IsTrusted = false,
+                            Password = "Lozinka",
+                            RepPoints = 1,
+                            Role = "Intern",
+                            UserName = "Ivan Ivic"
                         });
                 });
 
@@ -235,7 +245,7 @@ namespace DataLayer.Migrations
                         {
                             UserId = 1,
                             ResourceId = 1,
-                            IsCommented = false,
+                            IsCommented = true,
                             IsVoted = false
                         });
                 });

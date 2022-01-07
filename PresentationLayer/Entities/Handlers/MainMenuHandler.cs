@@ -1,7 +1,8 @@
 ﻿using DataLayer.Enums;
 using DomainLayer.Queries;
+using PresentationLayer.Entities.Utility;
 
-namespace PresentationLayer.Entities
+namespace PresentationLayer.Entities.Handlers
 {
     public static class MainMenuHandler
     {

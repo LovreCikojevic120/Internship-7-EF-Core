@@ -1,4 +1,4 @@
-﻿namespace PresentationLayer.Entities
+﻿namespace PresentationLayer.Entities.Utility
 {
     public static class Checkers
     {

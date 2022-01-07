@@ -1,6 +1,6 @@
 ﻿using DataLayer.Enums;
 
-namespace PresentationLayer.Entities
+namespace PresentationLayer.Entities.Utility
 {
     public class TaskManager
     {

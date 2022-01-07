@@ -2,8 +2,10 @@
 using DataLayer.Enums;
 using DomainLayer.Entities;
 using DataLayer.Entities.Models;
+using PresentationLayer.Entities.Interacters;
+using PresentationLayer.Entities.Utility;
 
-namespace PresentationLayer.Entities
+namespace PresentationLayer.Entities.Handlers
 {
     public class DashboardHandler
     {
@@ -39,12 +41,11 @@ namespace PresentationLayer.Entities
             {
                 foreach (var comment in resourceCommentList)
                 {
-                    Console.WriteLine(indent + $"ID: {comment.CommentId}\n{indent}Sadrzaj: {comment.CommentContent}\n" +
-                        indent + $"Likes: {comment.NumberOfLikes} Dislikes: {comment.NumberOfDislikes}\n");
+                    Printer.PrintComment(comment.Item1, comment.Item2, indent);
+                    
+                    PrintComments(resourceId, comment.Item1.CommentId, indent + "\t");
 
-                    PrintComments(resourceId, comment.CommentId, indent + "\t");
-
-                    commentQuery.AddUserComment(comment.CommentId);
+                    commentQuery.AddUserComment(comment.Item1.CommentId);
                 }
             }
         }
@@ -53,7 +54,7 @@ namespace PresentationLayer.Entities
         {
             if (resourceList is null || resourceList.Count == 0)
             {
-                Console.WriteLine("Lista resursa prazna!");
+                Console.WriteLine("Lista resursa prazna!\n");
                 return;
             }
 
@@ -63,7 +64,7 @@ namespace PresentationLayer.Entities
 
                 resourceQuery.AddUserResource(resource.Item1.ResourceId);
 
-                Console.WriteLine("Comments:\n");
+                
                 PrintComments(resource.Item1.ResourceId, null, "\t");
             }
         }
@@ -89,18 +90,20 @@ namespace PresentationLayer.Entities
 
         public bool GetAllUsers()
         {
+            Printer.PrintTitle("KORISNICI");
             var usersList = userQuery.ReadAllUsers();
 
             foreach (var user in usersList)
                 Printer.PrintUsers(user);
 
-            if(DatabaseStateTracker.CurrentUser.Role == "Admin")
+            if(DatabaseStateTracker.CurrentUser.Role == Enum.GetName(UserRole.Organizator))
             {
                 if (UserInteract.StartInteract())
                     return true;
             }  
+            else
+                Printer.ConfirmMessageAndClear("\nKorisnici ispisani", MessageType.Success);
 
-            Printer.ConfirmMessageAndClear("Korisnici ispisani", MessageType.Success);
             return false;
         }
 
@@ -123,11 +126,13 @@ namespace PresentationLayer.Entities
 
         public bool GetUserInfo()
         {
+            Printer.PrintTitle("VAŠI PODACI");
+
             var currentUserInfo = DatabaseStateTracker.CurrentUser;
             Printer.PrintUserPersonal(currentUserInfo);
 
             Printer.PrintUserSettingsMenu();
-            if(UserInteract.StartSettings())
+            if(UserInteract.StartSettings() is false)
                 return false;
 
             return true;
@@ -135,6 +140,8 @@ namespace PresentationLayer.Entities
 
         public bool GetPopularEntities()
         {
+            Printer.PrintTitle("POPULARNE OBJAVE");
+
             var resourceInteract = new EntityInteract();
             var resourceList = resourceQuery.GetPopularResources();
 

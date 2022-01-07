@@ -1,7 +1,8 @@
 ﻿using DataLayer.Enums;
 using DomainLayer.Queries;
+using PresentationLayer.Entities.Utility;
 
-namespace PresentationLayer.Entities
+namespace PresentationLayer.Entities.Interacters
 {
     public static class UserInteract
     {
@@ -23,12 +24,13 @@ namespace PresentationLayer.Entities
                     Reactivate();
                     break;
                 case 4:
-                    return true;
+                    Printer.ConfirmMessageAndClear("Vracate se na dashboard", MessageType.Note);
+                    return false;
                 default:
                     Printer.ConfirmMessageAndClear("Krivi unos!", MessageType.Error);
-                    return false;
+                    return true;
             }
-            return false;
+            return true;
         }
 
         public static bool StartSettings()
@@ -45,18 +47,18 @@ namespace PresentationLayer.Entities
                     break;
                 case 3:
                     Printer.ConfirmMessageAndClear("Vracate se na dashboard", MessageType.Note);
-                    return true;
+                    return false;
                 default:
                     Printer.ConfirmMessageAndClear("Krivi unos!", MessageType.Error);
-                    return false;
+                    return true;
             }
-            return false;
+            return true;
         }
 
         private static void EditPassword()
         {
             var userQuery = new UserQueries();
-            Console.WriteLine("Novo ime?");
+            Console.WriteLine("Upisite novo korisničko ime[MIN 5 znakova], ostavite prazno polje ako zelite odustati:");
             var validInput = Checkers.CheckString(Console.ReadLine().Trim(), out string result);
             userQuery.EditPassword(result);
         }
@@ -64,7 +66,7 @@ namespace PresentationLayer.Entities
         private static void EditUserName()
         {
             var userQuery = new UserQueries();
-            Console.WriteLine("Novi pass?");
+            Console.WriteLine("Upisite novu lozinku[MIN 5 znakova], ostavite prazno polje ako zelite odustati:");
             var validInput = Checkers.CheckString(Console.ReadLine().Trim(), out string result);
             userQuery.EditUserName(result);
         }
@@ -73,7 +75,7 @@ namespace PresentationLayer.Entities
         {
             var userQuery = new UserQueries();
 
-            Console.WriteLine("Id?");
+            Console.WriteLine("Upisite ID korisnika:");
             var userId = int.Parse(Console.ReadLine());
 
             userQuery.Reactivate(userId);
@@ -83,7 +85,7 @@ namespace PresentationLayer.Entities
         {
             var userQuery = new UserQueries();
 
-            Console.WriteLine("Id?");
+            Console.WriteLine("Upisite ID korisnika:");
             var userId = int.Parse(Console.ReadLine());
 
             userQuery.PermaDeactivate(userId);
@@ -93,9 +95,9 @@ namespace PresentationLayer.Entities
         {
             var userQuery = new UserQueries();
 
-            Console.WriteLine("Id?");
+            Console.WriteLine("Upisite ID korisnika:");
             var userId = int.Parse(Console.ReadLine());
-            Console.WriteLine("Dani?");
+            Console.WriteLine("Upiste broj dana za deaktivaciju:");
             var numberOfDays = int.Parse(Console.ReadLine());
 
             userQuery.TemporaryDeactivate(userId, numberOfDays);

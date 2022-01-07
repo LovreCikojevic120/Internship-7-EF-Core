@@ -1,4 +1,6 @@
-﻿namespace PresentationLayer.Entities
+﻿using PresentationLayer.Entities.Utility;
+
+namespace PresentationLayer.Entities
 {
     static class StartProgram
     {

@@ -1,9 +1,10 @@
 ﻿using DataLayer.Enums;
 using DomainLayer.Entities;
 using DomainLayer.Queries;
+using PresentationLayer.Entities.Utility;
 using PresentationLayer.Enums;
 
-namespace PresentationLayer.Entities
+namespace PresentationLayer.Entities.Interacters
 {
     public class EntityInteract
     {
@@ -58,16 +59,16 @@ namespace PresentationLayer.Entities
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId, 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, 
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, helpQuery.IsResource(entityId),
                 resourceQuery.DeleteResource(entityId)))
                 return;
 
             if (ErrorHandler.PrintError(validId, 
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, 
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDelete, helpQuery.IsComment(entityId),
                 commentQuery.DeleteComment(entityId)))
                 return;
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greška", MessageType.Error);
         }
 
         private void EditEntity()
@@ -80,12 +81,12 @@ namespace PresentationLayer.Entities
             var validString = Checkers.CheckString(Console.ReadLine(), out string newContent);
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity, helpQuery.IsResource(entityId),
                 resourceQuery.EditResource(entityId, newContent)))
                 return;
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanEditAnyEntity, helpQuery.IsComment(entityId),
                 commentQuery.EditComment(entityId, newContent)))
                 return;
 
@@ -98,16 +99,16 @@ namespace PresentationLayer.Entities
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteResource,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteResource, helpQuery.IsResource(entityId),
                 resourceQuery.DislikeResource(entityId)))
                 return;
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteComment,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanDownvoteComment, helpQuery.IsComment(entityId),
                 commentQuery.DislikeComment(entityId)))
                 return;
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greška", MessageType.Error);
         }
 
         private void LikeEntity()
@@ -116,16 +117,16 @@ namespace PresentationLayer.Entities
             var validId = Checkers.CheckForNumber(Console.ReadLine(), out int entityId);
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote, helpQuery.IsResource(entityId),
                 resourceQuery.LikeResource(entityId)))
                 return;
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanUpvote, helpQuery.IsComment(entityId),
                 commentQuery.LikeComment(entityId)))
                 return;
 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greška", MessageType.Error);
         }
 
         private void Comment()
@@ -137,11 +138,11 @@ namespace PresentationLayer.Entities
             var validInput = Checkers.CheckString(Console.ReadLine(), out string content);
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanComment, helpQuery.IsResource(entityId),
                 resourceQuery.CommentResource(entityId, content)))
                 return;
                 
-            Printer.ConfirmMessageAndClear("Resurs ne postoji", MessageType.Error);
+            Printer.ConfirmMessageAndClear("Greska", MessageType.Error);
 
         }
 
@@ -154,7 +155,7 @@ namespace PresentationLayer.Entities
             var validInput = Checkers.CheckString(Console.ReadLine().Trim(), out string content);
 
             if (ErrorHandler.PrintError(validId,
-                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply,
+                DatabaseStateTracker.CurrentUser.RepPoints < (int)ReputationPoints.CanReply, helpQuery.IsComment(entityId),
                 commentQuery.ReplyOnComment(entityId, content)))
                 return;
 

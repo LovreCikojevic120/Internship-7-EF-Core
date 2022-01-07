@@ -64,7 +64,7 @@ namespace DomainLayer.Queries
         public List<(Resource, string)>? GetPopularResources()
         {
             var resourceList = dataBase.Resources.Where(t=>t.TimeOfPosting.Date == DateTime.Today)
-                .OrderBy(n => n.NumberOfReplys).Take(5).ToList();
+                .OrderByDescending(n => n.NumberOfReplys).Take(5).ToList();
 
             if( resourceList is null || resourceList.Count is 0)
                 return null;

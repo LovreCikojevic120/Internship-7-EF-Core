@@ -1,5 +1,7 @@
 ﻿using DataLayer.Enums;
 using DomainLayer.Entities;
+using PresentationLayer.Entities.Handlers;
+using PresentationLayer.Entities.Utility;
 
 namespace PresentationLayer.Entities
 {
@@ -9,6 +11,7 @@ namespace PresentationLayer.Entities
 
         public static bool MainMenuSwitcher()
         {
+            Printer.PrintTitle("MAIN MENU");
             Printer.PrintMainMenu();
 
             var isValidInput = Checkers.CheckForNumber(Console.ReadLine(), out int result);

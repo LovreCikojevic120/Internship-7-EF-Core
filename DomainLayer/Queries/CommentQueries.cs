@@ -49,7 +49,7 @@ namespace DomainLayer.Queries
 
         public bool ReplyOnComment(int commentId, string content)
         {
-            if (helpQuery.IsCommented(commentId) || helpQuery.IsComment(commentId) || content.Count() is 0)
+            if (helpQuery.IsCommented(commentId) || helpQuery.IsComment(commentId) is false || content.Count() is 0)
                 return false;
 
             var resourceId = helpQuery.GetResourceId(commentId);
@@ -121,9 +121,18 @@ namespace DomainLayer.Queries
             return true;
         }
 
-        public List<Comment> GetResourceComments(int resourceId, int? parentCommentId)
+        public List<(Comment, string)> GetResourceComments(int resourceId, int? parentCommentId)
         {
-            return dataBase.Comments.Where(c => c.ResourceId == resourceId && c.ParentCommentId == parentCommentId).ToList();
+            var commentList = dataBase.Comments.Where(c => c.ResourceId == resourceId && c.ParentCommentId == parentCommentId).ToList();
+
+            var list = new List<(Comment, string)>();
+            foreach (var comment in commentList)
+            {
+                var userName = helpQuery.GetAuthorName(null, comment.CommentId);
+                list.Add((comment, userName));
+            }
+
+            return list;
         }
 
         public List<Comment> GetSubComments(int? parentCommentId)

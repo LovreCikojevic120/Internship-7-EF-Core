@@ -13,11 +13,21 @@ namespace DataLayer.Entities
                     new User
                     {
                         UserId = 1,
-                        UserName = "Ivan Bakotin",
+                        UserName = "Jure Juric",
                         Password = "12345",
-                        Role = "Admin",
-                        RepPoints = 1000000,
+                        Role = "Organizator",
+                        RepPoints = 10000,
                         IsTrusted = true,
+                    },
+
+                    new User
+                    {
+                        UserId = 2,
+                        UserName = "Ivan Ivic",
+                        Password = "Lozinka",
+                        Role = "Intern",
+                        RepPoints = 1,
+                        IsTrusted = false,
                     }
                 });
 
@@ -32,7 +42,7 @@ namespace DataLayer.Entities
                         NumberOfDislikes = 4,
                         ParentCommentId = null,
                         TimeOfPosting = new DateTime(2021,10,10),
-                        CommentOwnerId = 1,
+                        CommentOwnerId = 2,
                         ResourceId = 1,
                     }
                 });
@@ -44,9 +54,10 @@ namespace DataLayer.Entities
                     {
                         ResourceId = 1,
                         ResourceContent = "Fritule su najbolje slatko",
-                        NumberOfReplys = 7,
+                        NumberOfReplys = 1,
                         NumberOfLikes = 4,
                         NumberOfDislikes = 4,
+                        TimeOfPosting = new DateTime(2021,10,10),
                         NameTag = "Dev",
                         ResourceOwnerId = 1,
                     },
@@ -56,6 +67,7 @@ namespace DataLayer.Entities
                         NumberOfLikes = 4,
                         NumberOfDislikes = 4,
                         ResourceContent = "Krokanti su najbolje slatko",
+                        TimeOfPosting = new DateTime(2021,10,10),
                         NumberOfReplys = 0,
                         NameTag = "Generalno",
                         ResourceOwnerId = 1,
@@ -69,6 +81,8 @@ namespace DataLayer.Entities
                     {
                         UserId = 1,
                         ResourceId = 1,
+                        IsCommented = true,
+                        IsVoted = false
                     }
                 });
 
@@ -77,8 +91,9 @@ namespace DataLayer.Entities
                 {
                     new UserComment
                     {
-                        UserId= 1,
+                        UserId= 2,
                         CommentId = 3,
+                        IsCommented = false,
                         IsVoted = false
                     }
                 });

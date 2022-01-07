@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class test : Migration
+    public partial class finalMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,7 +19,9 @@ namespace DataLayer.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RepPoints = table.Column<int>(type: "int", nullable: false),
-                    IsTrusted = table.Column<bool>(type: "bit", nullable: false)
+                    IsTrusted = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeactivated = table.Column<bool>(type: "bit", nullable: false),
+                    DeactivatedUntil = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -127,28 +129,33 @@ namespace DataLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "UserId", "IsTrusted", "Password", "RepPoints", "Role", "UserName" },
-                values: new object[] { 1, true, "12345", 1000000, "Admin", "Ivan Bakotin" });
+                columns: new[] { "UserId", "DeactivatedUntil", "IsDeactivated", "IsTrusted", "Password", "RepPoints", "Role", "UserName" },
+                values: new object[] { 1, null, false, true, "12345", 10000, "Organizator", "Jure Juric" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserId", "DeactivatedUntil", "IsDeactivated", "IsTrusted", "Password", "RepPoints", "Role", "UserName" },
+                values: new object[] { 2, null, false, false, "Lozinka", 1, "Intern", "Ivan Ivic" });
 
             migrationBuilder.InsertData(
                 table: "Resources",
                 columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
-                values: new object[] { 1, "Dev", 4, 4, 7, "Fritule su najbolje slatko", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 1, "Dev", 4, 4, 1, "Fritule su najbolje slatko", 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Resources",
                 columns: new[] { "ResourceId", "NameTag", "NumberOfDislikes", "NumberOfLikes", "NumberOfReplys", "ResourceContent", "ResourceOwnerId", "TimeOfPosting" },
-                values: new object[] { 2, "Generalno", 4, 4, 0, "Krokanti su najbolje slatko", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 2, "Generalno", 4, 4, 0, "Krokanti su najbolje slatko", 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Comments",
                 columns: new[] { "CommentId", "CommentContent", "CommentOwnerId", "NumberOfDislikes", "NumberOfLikes", "ParentCommentId", "ResourceId", "TimeOfPosting" },
-                values: new object[] { 3, "Fritule su bezveze", 1, 4, 4, null, 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 3, "Fritule su bezveze", 2, 4, 4, null, 1, new DateTime(2021, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "UserResources",
                 columns: new[] { "ResourceId", "UserId", "IsCommented", "IsVoted" },
-                values: new object[] { 1, 1, false, false });
+                values: new object[] { 1, 1, true, false });
 
             migrationBuilder.InsertData(
                 table: "UserComments",

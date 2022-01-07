@@ -2,11 +2,18 @@
 {
     public static class ErrorHandler
     {
-        public static bool PrintError(bool validInput, bool noPoints, bool validEntity)
+        public static bool PrintError(bool validInput, bool noPoints, bool doesExist, bool validEntity)
         {
             if (validInput is false)
             {
                 Console.WriteLine("Neispravan unos ID-a");
+                Console.ReadKey();
+                return false;
+            }
+
+            if(doesExist is false)
+            {
+                Console.WriteLine("Resurs ne postoji");
                 Console.ReadKey();
                 return false;
             }
@@ -28,6 +35,11 @@
             Console.WriteLine("Akcija uspjesno izvedena");
             Console.ReadKey();
             return true;
+        }
+
+        public static void ErrorCode()
+        {
+
         }
     }
 }
